@@ -1,0 +1,193 @@
+import { Platform, StyleSheet, Text, TextInput, TouchableOpacity, View, Image, ActivityIndicator, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import React, { useState } from 'react';
+import { useRouter } from 'expo-router';
+import { auth, db } from '@/firebaseConfig';
+import * as ImagePicker from 'expo-image-picker';
+import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { Ionicons } from '@expo/vector-icons';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
+import { Tickr } from '@/app/classes/Tickr';
+import { RecurringTickr } from '@/app/classes/RecurringTickr';
+
+export default function CreateTickr() {
+    const router = useRouter();
+    const user = auth.currentUser;
+    const storage = getStorage();  
+    
+    const [title, setTitle] = useState('');
+    const [date, setDate] = useState(new Date());
+    const [description, setDescription] = useState('');
+    const [showDatePicker, setShowDatePicker] = useState(false);
+    const [image, setImage] = useState<string | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState('');
+
+    // Recurring tickr options
+    const [isRecurring, setIsRecurring] = useState(false);
+    const [recurrence, setRecurrence] = useState<'daily' | 'weekly' | 'monthly'>('daily');
+
+    // Pick image from gallery
+    const pickImage = async () => {
+        const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (!permissionResult.granted) {
+            alert("Permission to access gallery is required");
+            return;
+        }
+        const result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [4, 3],
+            quality: 0.8,
+        });
+        if (!result.canceled) {
+            setImage(result.assets[0].uri);
+        }
+    };
+
+    // Upload image to Firebase Storage
+    const uploadImage = async (uri: string): Promise<string> => {
+        try {
+            const response = await fetch(uri);
+            if (!response.ok) throw new Error(`Image fetch failed: ${response.status}`);
+            const blob = await response.blob();
+            const fileName = `${encodeURIComponent(user?.uid || 'unknown')}-${Date.now()}.jpg`;
+            const storageRef = ref(storage, `tickrImages/${fileName}`);
+            await uploadBytes(storageRef, blob, { contentType: 'image/jpeg' });
+            return await getDownloadURL(storageRef);
+        } catch (e) {
+            console.error("Image upload failed: ", e);
+            throw new Error('Image upload failed');
+        }
+    };
+
+    // Save Tickr to Firestore
+    const saveTickr = async () => {
+        if (!title.trim()) { setError('Title is required'); return; }
+        if (!date) { setError('Please select a valid date.'); return; }
+        setError('');
+        setLoading(true);
+
+        try {
+            let imageUrl: string | undefined = undefined;
+            if (image) imageUrl = await uploadImage(image);
+
+            let newTickr;
+            if (isRecurring) {
+                newTickr = new RecurringTickr(title, description, date, imageUrl ?? null, recurrence);
+            } else {
+                newTickr = new Tickr(title, description, date, imageUrl);
+            }
+
+            const tickrRef = collection(db, 'users', user.uid, 'tickrs');
+            await addDoc(tickrRef, {
+                ...newTickr.toFirestore(),
+                createdAt: serverTimestamp(),
+            });
+
+            router.back();
+        } catch (e) {
+            console.error("Error adding Tickr: ", e);
+            setError('Failed to save Tickr. Please try again.');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    return (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <View style={styles.container}>
+            <Text style={styles.title}>Create New Tickr</Text>
+            {error ? <Text style={styles.error}>{error}</Text> : null}
+
+            {/* Title */}
+            <TextInput
+                style={styles.input}
+                placeholder="Tickr Title"
+                value={title}
+                onChangeText={setTitle}
+            />
+            {/* Description */}
+            <TextInput
+                style={styles.input}
+                placeholder="Description (optional)"
+                value={description}
+                onChangeText={setDescription}
+            />
+
+            {/* Date Picker */}
+            <TouchableOpacity style={styles.dateButton} onPress={() => setShowDatePicker(true)}>
+                <Ionicons name="calendar" size={20} color="#fff" /> 
+                <Text style={styles.dateText}>Date: {date.toDateString()}</Text>
+            </TouchableOpacity>
+            {showDatePicker && (
+                <DateTimePicker
+                    value={date}
+                    mode="date"
+                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                    onChange={(event, selectedDate) => {
+                        if (event.type === 'set' && selectedDate) setDate(selectedDate);
+                        if (event.type === 'set' || event.type === 'dismissed') setShowDatePicker(false);
+                    }}
+                />
+            )}
+
+            {/* Recurring toggle */}
+            <View style={styles.recurringContainer}>
+                <Text style={styles.recurringLabel}>Recurring Tickr?</Text>
+                <TouchableOpacity onPress={() => setIsRecurring(!isRecurring)} style={styles.toggleButton}>
+                    <Text style={styles.toggleText}>{isRecurring ? 'Yes' : 'No'}</Text>
+                </TouchableOpacity>
+            </View>
+
+            {/* Recurrence type (only if recurring) */}
+            {isRecurring && (
+                <View style={styles.recurrenceContainer}>
+                    {['daily', 'weekly', 'monthly'].map(option => (
+                        <TouchableOpacity key={option} onPress={() => setRecurrence(option as 'daily' | 'weekly' | 'monthly')} style={[
+                            styles.recurrenceButton,
+                            recurrence === option && styles.recurrenceSelected
+                        ]}>
+                            <Text style={styles.recurrenceText}>{option}</Text>
+                        </TouchableOpacity>
+                    ))}
+                </View>
+            )}
+
+            {/* Image Picker */}
+            <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
+                <Ionicons name="image-outline" size={20} color="#fff" />
+                <Text style={styles.imageText}>{image ? "Change Image" : "Add Image (optional)"}</Text>
+            </TouchableOpacity>
+            {image && <Image source={{ uri: image }} style={styles.previewImage} />}
+
+            {/* Save Button */}
+            <TouchableOpacity style={styles.saveButton} onPress={saveTickr} disabled={loading}>
+                {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveText}>Save Tickr</Text>}
+            </TouchableOpacity>
+        </View>
+        </TouchableWithoutFeedback>
+    );
+}
+
+const styles = StyleSheet.create({
+    container: { flex: 1, padding: 20, backgroundColor: '#fff' },
+    title: { fontSize: 24, fontWeight: 'bold', marginTop: 50, marginBottom: 20, textAlign: 'center' },
+    input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 12, marginBottom: 12, fontSize: 16 },
+    error: { color: 'red', textAlign: 'center', marginBottom: 10 },
+    dateButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#6c63ff', padding: 12, borderRadius: 8, marginBottom: 12 },
+    dateText: { color: '#fff', fontSize: 16 },
+    imageButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#a60fdc', padding: 12, borderRadius: 8, marginBottom: 12 },
+    imageText: { color: '#fff', fontSize: 16 },
+    previewImage: { width: '100%', height: 150, borderRadius: 8, marginBottom: 12 },
+    saveButton: { backgroundColor: '#28a745', padding: 16, borderRadius: 8, alignItems: 'center', marginTop: 20 },
+    saveText: { color: '#fff', fontSize: 18, fontWeight: 'bold' },
+    recurringContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: 12 },
+    recurringLabel: { fontSize: 16, marginRight: 10 },
+    toggleButton: { backgroundColor: '#6c63ff', padding: 8, borderRadius: 8 },
+    toggleText: { color: '#fff', fontSize: 16 },
+    recurrenceContainer: { flexDirection: 'row', justifyContent: 'space-around', marginBottom: 12 },
+    recurrenceButton: { padding: 10, borderRadius: 8, borderWidth: 1, borderColor: '#ccc' },
+    recurrenceSelected: { backgroundColor: '#6c63ff', borderColor: '#6c63ff' },
+    recurrenceText: { color: '#fff', fontWeight: 'bold' },
+});

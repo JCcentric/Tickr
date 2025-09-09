@@ -1,41 +1,41 @@
 {
   "project_info": {
-    "project_number": "618582402852",
+    "project_number": "Your project number here",
     "project_id": "tickrapp-001",
     "storage_bucket": "tickrapp-001.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:618582402852:android:b6daa546d0da9c0b3cb5b1",
+        "mobilesdk_app_id": "Your app ID here",
         "android_client_info": {
           "package_name": "com.jccentric.TickrApp"
         }
       },
       "oauth_client": [
         {
-          "client_id": "618582402852-6hkkc1rmsj55eaoer8nfqus8bnprl064.apps.googleusercontent.com",
+          "client_id": "Your client ID here",
           "client_type": 1,
           "android_info": {
             "package_name": "com.jccentric.TickrApp",
-            "certificate_hash": "74adabb1a1a63b29a6b05ecd7370a69bcdc882f8"
+            "certificate_hash": "Your certificate hash here"
           }
         },
         {
-          "client_id": "618582402852-fpv1sqvtukf2dlhnfi8n6u1fu7iug4gd.apps.googleusercontent.com",
+          "client_id": "Your client ID here",
           "client_type": 3
         }
       ],
       "api_key": [
         {
-          "current_key": "AIzaSyDHOxVfDpmL-YWyb1Gz0x25EICG0F8CcAI"
+          "current_key": "Your API key here"
         }
       ],
       "services": {
         "appinvite_service": {
           "other_platform_oauth_client": [
             {
-              "client_id": "618582402852-fpv1sqvtukf2dlhnfi8n6u1fu7iug4gd.apps.googleusercontent.com",
+              "client_id": "Your client ID here",
               "client_type": 3
             }
           ]

@@ -152,6 +152,7 @@ export default function HomeScreen() {
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
       <View style={styles.container}>
+        <Text style={styles.unclassBanner}>Unclassified</Text>
         <Text style={styles.title}>Your Tickrs</Text>
     
         {/* Search Bar */}
@@ -236,7 +237,7 @@ const styles = StyleSheet.create({
   },
   signOutButton: {
     position: "absolute",
-    top: 15,
+    top: 50,
     right: 20,
     paddingVertical: 8,
     paddingHorizontal: 16,
@@ -269,5 +270,15 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#000"
   },
+  unclassBanner: {
+    backgroundColor: '#50df24ff',
+    color: '#000',
+    textAlign: 'center',
+    width: '100%',
+    paddingVertical: 3,
+    borderRadius: 8,
+    marginBottom: 10,
+    fontWeight: 'bold'
+  }
 });
 

@@ -8,7 +8,6 @@ import { Ionicons } from '@expo/vector-icons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import { Tickr } from '@/app/classes/Tickr';
-import { RecurringTickr } from '@/app/classes/RecurringTickr';
 
 export default function CreateTickr() {
     const router = useRouter();
@@ -46,15 +45,20 @@ export default function CreateTickr() {
     };
 
     // Upload image to Firebase Storage
-    const uploadImage = async (uri: string): Promise<string> => {
+    const uploadImage = async (uri: string): Promise<{ url: string; path: string }> => {
         try {
             const response = await fetch(uri);
             if (!response.ok) throw new Error(`Image fetch failed: ${response.status}`);
             const blob = await response.blob();
+
             const fileName = `${encodeURIComponent(user?.uid || 'unknown')}-${Date.now()}.jpg`;
-            const storageRef = ref(storage, `tickrImages/${fileName}`);
+            const storagePath = `tickrImages/${fileName}`;
+            const storageRef = ref(storage, storagePath);
+
             await uploadBytes(storageRef, blob, { contentType: 'image/jpeg' });
-            return await getDownloadURL(storageRef);
+            const url = await getDownloadURL(storageRef);
+
+            return {url, path: storagePath};
         } catch (e) {
             console.error("Image upload failed: ", e);
             throw new Error('Image upload failed');
@@ -70,21 +74,24 @@ export default function CreateTickr() {
 
         try {
             let imageUrl: string | undefined = undefined;
-            if (image) imageUrl = await uploadImage(image);
+            let imagePath: string | undefined = undefined;
 
-            let newTickr;
-            if (isRecurring) {
-                newTickr = new RecurringTickr(title, description, date, imageUrl ?? null, recurrence);
-            } else {
-                newTickr = new Tickr(title, description, date, imageUrl);
+            if (image) {
+                const uploadResult = await uploadImage(image);
+                imageUrl = uploadResult.url;
+                imagePath = uploadResult.path;
             }
 
-            const tickrRef = collection(db, 'users', user.uid, 'tickrs');
-            await addDoc(tickrRef, {
-                ...newTickr.toFirestore(),
-                createdAt: serverTimestamp(),
-            });
-
+            const tickrData = {
+                title,
+                description,
+                date,
+                imageUrl,
+                imagePath,
+                createAt: serverTimestamp(),
+            };
+            
+            await addDoc(collection(db, "users", user?.uid, "tickrs"), tickrData);
             router.back();
         } catch (e) {
             console.error("Error adding Tickr: ", e);
@@ -130,28 +137,6 @@ export default function CreateTickr() {
                         if (event.type === 'set' || event.type === 'dismissed') setShowDatePicker(false);
                     }}
                 />
-            )}
-
-            {/* Recurring toggle */}
-            <View style={styles.recurringContainer}>
-                <Text style={styles.recurringLabel}>Recurring Tickr?</Text>
-                <TouchableOpacity onPress={() => setIsRecurring(!isRecurring)} style={styles.toggleButton}>
-                    <Text style={styles.toggleText}>{isRecurring ? 'Yes' : 'No'}</Text>
-                </TouchableOpacity>
-            </View>
-
-            {/* Recurrence type (only if recurring) */}
-            {isRecurring && (
-                <View style={styles.recurrenceContainer}>
-                    {['daily', 'weekly', 'monthly'].map(option => (
-                        <TouchableOpacity key={option} onPress={() => setRecurrence(option as 'daily' | 'weekly' | 'monthly')} style={[
-                            styles.recurrenceButton,
-                            recurrence === option && styles.recurrenceSelected
-                        ]}>
-                            <Text style={styles.recurrenceText}>{option}</Text>
-                        </TouchableOpacity>
-                    ))}
-                </View>
             )}
 
             {/* Image Picker */}

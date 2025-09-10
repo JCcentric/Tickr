@@ -1,9 +1,6 @@
 import { Text, ActivityIndicator, StyleSheet, View, TouchableOpacity, FlatList, TextInput, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Swipeable } from 'react-native-gesture-handler';
-import * as FileSystem from 'expo-file-system';
-import * as Sharing from 'expo-sharing';
-import * as XLSX from 'xlsx';
 
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/firebaseConfig';
@@ -49,6 +46,7 @@ export default function HomeScreen() {
     return () => unsubscribe();
   }, []);
 
+  //Search Functionality
   const handleSearch = (text: string) => {
     setSearchQuery(text);
     if (text === "") {
@@ -61,25 +59,32 @@ export default function HomeScreen() {
     }
   };
 
+
+  // Clear search input
   const clearSearch = () => {
     setSearchQuery("");
     setFilteredTickrs(tickrs);
   };
 
-  const deleteTickr = async (tickrId: string, imageUrl?: string) => {
+
+  //Delete Functionality
+  const deleteTickr = async (tickrId: string, imagePath?: string) => {
     try {
       const user = auth.currentUser;
       if (!user) return;
 
-      if (imageUrl) {
-        const storage = getStorage();
-        const path = decodeURIComponent(imageUrl.split('/o/')[1].split('?')[0]);
-        const storageRef = ref(storage, path);
+      // Delete image from Firebase Storage if exists
+      if (imagePath) {
+        const storageRef = ref(getStorage(), imagePath);
         await deleteObject(storageRef);
-      }
+        console.log(`${imagePath} deleted successfully`);
+        } 
 
+      // Delete Firestore document
       const tickrDocRef = doc(db, "users", user.uid, "tickrs", tickrId);
       await deleteDoc(tickrDocRef);
+
+      // Update local state
       setTickrs(prev => prev.filter(t => t.id !== tickrId));
       setFilteredTickrs(prev => prev.filter(t => t.id !== tickrId));
 
@@ -99,46 +104,6 @@ export default function HomeScreen() {
     );
   };
 
-  // ✅ Export to Excel
-  const exportToExcel = async () => {
-    try {
-      if (tickrs.length === 0) {
-        Alert.alert("No data", "There are no tickrs to export.");
-        return;
-      }
-
-      // Prepare data for Excel
-      const data = tickrs.map((item, index) => ({
-        "No.": index + 1,
-        "Title": item.title || "",
-        "Description": item.description || "",
-        "Date Created": new Date(item.date).toLocaleDateString(),
-        "Image URL": item.imageUrl || ""
-      }));
-
-      // Create worksheet and workbook
-      const ws = XLSX.utils.json_to_sheet(data);
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Tickrs");
-
-      // Convert workbook to binary string
-      const wbout = XLSX.write(wb, { type: "base64", bookType: "xlsx" });
-
-      // Create file path
-      const fileUri = FileSystem.documentDirectory + "tickrs_report.xlsx";
-
-      // Write the file
-      await FileSystem.writeAsStringAsync(fileUri, wbout, {
-        encoding: FileSystem.EncodingType.Base64
-      });
-
-      // Share file
-      await Sharing.shareAsync(fileUri);
-    } catch (error) {
-      console.error("Error exporting Excel:", error);
-      Alert.alert("Error", "Failed to export report.");
-    }
-  };
 
   if (loading) {
     return (
@@ -178,12 +143,6 @@ export default function HomeScreen() {
           )}
         </View>
         
-        {/* Export Button */}
-        <TouchableOpacity style={styles.exportButton} onPress={exportToExcel}>
-          <Ionicons name="download-outline" size={20} color="#fff" />
-          <Text style={styles.exportText}> Export Report</Text>
-        </TouchableOpacity>
-        
         {/* Tickr List */}
         {filteredTickrs.length === 0 ? (
           <Text style={styles.noTickr}>No tickrs found.</Text>
@@ -193,7 +152,7 @@ export default function HomeScreen() {
             data={filteredTickrs}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <Swipeable renderRightActions={() => renderRightActions(item.id, item.image)}>
+              <Swipeable renderRightActions={() => renderRightActions(item.id, item.imagePath)}>
                 <TickrCard
                   title={item.title}
                   description={item.description}
@@ -282,19 +241,5 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#000"
   },
-  exportButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#4CAF50",
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderRadius: 8,
-    marginBottom: 15,
-    alignSelf: "center"
-  },
-  exportText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "bold"
-  }
 });
+

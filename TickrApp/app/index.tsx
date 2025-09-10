@@ -141,13 +141,6 @@ export default function HomeScreen() {
     );
   }
 
-  const signOut = async () => {
-    try {
-      await auth.signOut();
-    } catch (error) {
-      console.error("Sign out error:", error);
-    }
-  };
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
@@ -209,9 +202,12 @@ export default function HomeScreen() {
           <Ionicons name="add" size={28} color={'#fff'}></Ionicons>
         </TouchableOpacity>
       
-        <TouchableOpacity style={styles.signOutButton} onPress={signOut}>
-          <Text style={styles.signOutText}>Sign Out</Text>
+      {/*Profile Button*/} 
+        <TouchableOpacity style={styles.profileIcon} onPress={() => router.push("/addScreens/profile")}>
+                <Ionicons name="person-circle-outline" size={45} color="#888" />
         </TouchableOpacity>
+
+        
       </View>
     </TouchableWithoutFeedback>
   );
@@ -235,16 +231,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
     elevation: 5,
   },
-  signOutButton: {
-    position: "absolute",
-    top: 50,
-    right: 20,
-    paddingVertical: 8,
-    paddingHorizontal: 16,
-    backgroundColor: "#ff4d4d",
-    borderRadius: 8,
-  },
-  signOutText: { color: "#fff", fontWeight: "bold" },
   swipeDelete: {
     backgroundColor: '#ff4d4d',
     justifyContent: 'center',
@@ -277,8 +263,13 @@ const styles = StyleSheet.create({
     width: '100%',
     paddingVertical: 3,
     borderRadius: 8,
-    marginBottom: 10,
+    marginBottom: 15,
     fontWeight: 'bold'
-  }
+  },
+  profileIcon: {
+    position: "absolute",
+    top: 50,
+    right: 20,
+  },
 });
 

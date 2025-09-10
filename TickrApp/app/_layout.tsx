@@ -4,7 +4,8 @@ import { auth } from "../firebaseConfig"; // your firebase config file
 import { Stack } from "expo-router";
 import { ActivityIndicator, View, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
-import 'react-native-reanimated';
+
+
 
 
 export default function RootLayout() {

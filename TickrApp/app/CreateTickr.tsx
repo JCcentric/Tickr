@@ -1,13 +1,14 @@
-import { Platform, StyleSheet, Text, TextInput, TouchableOpacity, View, Image, ActivityIndicator, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { StyleSheet, Text, TextInput, TouchableOpacity, View, Image, ActivityIndicator, TouchableWithoutFeedback, Keyboard, Platform } from 'react-native';
 import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { auth, db } from '@/firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
 import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
 import { Ionicons } from '@expo/vector-icons';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
-import { Tickr } from '@/app/classes/Tickr';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
+
+
 
 export default function CreateTickr() {
     const router = useRouter();
@@ -16,15 +17,11 @@ export default function CreateTickr() {
     
     const [title, setTitle] = useState('');
     const [date, setDate] = useState(new Date());
+    const [isDatePickervisible, setDatePickerVisible] = useState(false); 
     const [description, setDescription] = useState('');
-    const [showDatePicker, setShowDatePicker] = useState(false);
     const [image, setImage] = useState<string | null>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
-
-    // Recurring tickr options
-    const [isRecurring, setIsRecurring] = useState(false);
-    const [recurrence, setRecurrence] = useState<'daily' | 'weekly' | 'monthly'>('daily');
 
     // Pick image from gallery
     const pickImage = async () => {
@@ -90,7 +87,7 @@ export default function CreateTickr() {
                 imagePath,
                 createAt: serverTimestamp(),
             };
-            
+
             await addDoc(collection(db, "users", user?.uid, "tickrs"), tickrData);
             router.back();
         } catch (e) {
@@ -123,21 +120,22 @@ export default function CreateTickr() {
             />
 
             {/* Date Picker */}
-            <TouchableOpacity style={styles.dateButton} onPress={() => setShowDatePicker(true)}>
+            <TouchableOpacity style={styles.dateButton} onPress={() => setDatePickerVisible(true)}>
                 <Ionicons name="calendar" size={20} color="#fff" /> 
-                <Text style={styles.dateText}>Date: {date.toDateString()}</Text>
+                <Text style={styles.dateText}> Date: {date.toDateString()}</Text>
             </TouchableOpacity>
-            {showDatePicker && (
-                <DateTimePicker
-                    value={date}
-                    mode="date"
-                    display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-                    onChange={(event, selectedDate) => {
-                        if (event.type === 'set' && selectedDate) setDate(selectedDate);
-                        if (event.type === 'set' || event.type === 'dismissed') setShowDatePicker(false);
-                    }}
-                />
-            )}
+
+            <View style={{justifyContent: 'center', alignItems: 'center'}}> 
+            <DateTimePickerModal
+                textColor='#000'
+                isVisible={isDatePickervisible}
+                mode="date"
+                display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+                date = {date}
+                onConfirm={(selectedDate) => { setDatePickerVisible(false); setDate(selectedDate); }}
+                onCancel={() => { setDatePickerVisible(false); }}
+            />
+            </View>
 
             {/* Image Picker */}
             <TouchableOpacity style={styles.imageButton} onPress={pickImage}>

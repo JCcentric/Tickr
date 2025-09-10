@@ -74,7 +74,18 @@ export default function TickrDetails() {
                     {/* Edit Button */}
                     <TouchableOpacity
                     style={styles.editButton}
-                    onPress={() => router.push({ pathname: '/EditTickr', params: { id, title, description, date, image } })}
+                    onPress={() => router.push({ 
+                        pathname: '/EditTickr', 
+                        params: { 
+                            id, 
+                            title, 
+                            description, 
+                            date: typeof date === "object" && date !== null && "seconds" in date && typeof (date as { seconds?: unknown }).seconds === "number" 
+                                ? new Date((date as { seconds: number }).seconds * 1000).toISOString() 
+                                : date, 
+                            image 
+                        } 
+                    })}
                     >
                         <Ionicons name="create-outline" size={28} color="#fff" />
                     </TouchableOpacity>

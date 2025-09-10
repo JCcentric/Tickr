@@ -28,6 +28,9 @@ export default function HomeScreen() {
     return unsubscribe;
   }, []);
 
+
+
+  // Fetch tickrs from Firestore
   useEffect(() => {
     const user = auth.currentUser;
     if (!user) return;
@@ -37,13 +40,28 @@ export default function HomeScreen() {
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const tickrList = snapshot.docs.map(doc => {
-      const data = doc.data();
-        return {
-          id: doc.id,
-          ...data,
-          date: data.date?.toDate().toISOString(), // convert Timestamp → ISO string
-        };
-    });
+        const data = doc.data();
+
+          let normalizedDate: string | null = null;
+          if (data.date) {
+            if (typeof data.date.toDate === "function") {
+              // Firestore Timestamp
+              normalizedDate = data.date.toDate().toISOString();
+            } else if (data.date instanceof Date) {
+              // Already a JS Date
+              normalizedDate = data.date.toISOString();
+            } else if (typeof data.date === "string") {
+              // Already stored as a string
+              normalizedDate = data.date;
+            }
+          }
+
+          return {
+            id: doc.id,
+            ...data,
+            date: normalizedDate, // convert Timestamp → ISO string
+          };
+      });
       setTickrs(tickrList);
       setFilteredTickrs(tickrList);
     }, (error) => {
@@ -52,6 +70,9 @@ export default function HomeScreen() {
 
     return () => unsubscribe();
   }, []);
+
+
+
 
   //Search Functionality
   const handleSearch = (text: string) => {

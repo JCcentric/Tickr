@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { auth, db } from '@/firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
-import { addDoc, collection, serverTimestamp } from 'firebase/firestore';
+import { addDoc, collection, serverTimestamp, Timestamp } from 'firebase/firestore';
 import { Ionicons } from '@expo/vector-icons';
 import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
@@ -70,23 +70,29 @@ export default function CreateTickr() {
         setLoading(true);
 
         try {
-            let imageUrl: string | undefined = undefined;
-            let imagePath: string | undefined = undefined;
+            type TickrData = {
+                title: string;
+                description: string;
+                date: Timestamp;
+                createAt: any;
+                imageUrl?: string;
+                imagePath?: string;
+            };
+
+            const tickrData: TickrData = {
+                title,
+                description,
+                date: Timestamp.fromDate(date),
+                createAt: serverTimestamp(),
+            };
 
             if (image) {
                 const uploadResult = await uploadImage(image);
-                imageUrl = uploadResult.url;
-                imagePath = uploadResult.path;
+                tickrData.imageUrl = uploadResult.url;
+                tickrData.imagePath = uploadResult.path;
             }
 
-            const tickrData = {
-                title,
-                description,
-                date,
-                imageUrl,
-                imagePath,
-                createAt: serverTimestamp(),
-            };
+            
 
             await addDoc(collection(db, "users", user?.uid, "tickrs"), tickrData);
             router.back();

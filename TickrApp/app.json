@@ -1,10 +1,10 @@
 {
   "expo": {
-    "name": "TickrApp",
+    "name": "TICKR",
     "slug": "TickrApp",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/images/icon.png",
+    "icon": "./assets/images/TICKR_Icon.png",
     "scheme": "tickrapp",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,

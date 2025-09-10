@@ -36,7 +36,14 @@ export default function HomeScreen() {
     const q = query(tickrRef, orderBy("date", "desc"));
 
     const unsubscribe = onSnapshot(q, (snapshot) => {
-      const tickrList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+      const tickrList = snapshot.docs.map(doc => {
+      const data = doc.data();
+        return {
+          id: doc.id,
+          ...data,
+          date: data.date?.toDate().toISOString(), // convert Timestamp → ISO string
+        };
+    });
       setTickrs(tickrList);
       setFilteredTickrs(tickrList);
     }, (error) => {

@@ -63,6 +63,8 @@ export default function RootLayout() {
         <Stack.Screen name="+not-found" />
         <Stack.Screen name="TickrDetails" options={{presentation: 'modal', animation: 'slide_from_bottom', headerShown: false}} />
         <Stack.Screen name="EditTickr" options={{presentation: 'formSheet', animation: 'flip', headerShown: false}} />
+        <Stack.Screen name="CreateTickr" options={{presentation: 'formSheet', animation: 'slide_from_bottom', headerShown: false}} />
+        <Stack.Screen name="profile" options={{title: 'Profile Settings', presentation: 'card', headerShown: true, headerBackVisible: true, headerBackButtonDisplayMode: 'minimal'}} />
       </Stack>
     )}
 

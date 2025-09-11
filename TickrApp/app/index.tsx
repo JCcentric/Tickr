@@ -203,7 +203,7 @@ export default function HomeScreen() {
         </TouchableOpacity>
       
       {/*Profile Button*/} 
-        <TouchableOpacity style={styles.profileIcon} onPress={() => router.push("/addScreens/profile")}>
+        <TouchableOpacity style={styles.profileIcon} onPress={() => router.push("/profile")}>
                 <Ionicons name="person-circle-outline" size={45} color="#888" />
         </TouchableOpacity>
 

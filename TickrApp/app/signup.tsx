@@ -54,6 +54,7 @@ export default function SignUpPage() {
                     firstName,
                     lastName,
                     email: email.trim(),
+                    profilePicture: null,
                     createdAt: serverTimestamp()
                 })
 

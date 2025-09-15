@@ -8,23 +8,20 @@ import {
   Alert,
   ActivityIndicator,
   Modal,
+  Button
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
 import { auth, db } from "@/firebaseConfig";
 import { doc, getDoc } from "firebase/firestore";
-import {getAuth, updatePassword} from "firebase/auth";
+import {getAuth, updatePassword, sendPasswordResetEmail} from "firebase/auth";
 import { TextInput } from "react-native-gesture-handler";
-import { Button } from "@react-navigation/elements";
 
 export default function ProfileScreen() {
   const router = useRouter();
   const [userData, setUserData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [newPassword, setNewPassword] = useState('');
-  const [modalVisible, setModalVisible] = useState(false);
-  const [confirmPassword, setConfirmPassword] = useState('');
-  const [changingPassword, setChangingPassword] = useState(false);
+
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -100,37 +97,18 @@ export default function ProfileScreen() {
 
 
   //Change Password function
-  const handleChangePassword async = (password: string) => {
-    setChangingPassword(true);
+  const handleChangePassword = async () => {
     try{
-      const user = auth.currentUser;
-      await user.updatePassword(password);
-      Alert.alert('Success', 'Password updated successfully');
-      setModalVisible(false);
-      setNewPassword('');
-      setConfirmPassword('');
-    } catch(error: any) {
-      Alert.alert('Error', error.message || 'Failed to update password');
-      console.error('Password update error:', error);
-    } finally{
-      setChangingPassword(false);
-    }
-  };
-
-  const onConfirmPress = () => {
-    if (!newPassword || !confirmPassword) {
-      Alert.alert('Error', 'Please fill out both fields');
-      return;
-    }
-    if (newPassword !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
-      return;
-    }
-    if (newPassword.length < 6) {
-      Alert.alert('Error', 'Password should be at least 6 characters');
-      return;
-    }
-    handleChangePassword(newPassword);
+      if (auth.currentUser?.email) {
+        await sendPasswordResetEmail(auth, auth.currentUser.email);
+        Alert.alert("Password Reset", "A password reset email has been sent to your email address.");
+      } else{
+        Alert.alert("Error", "No email associated with this account.");
+      }
+    } catch (error) {
+      console.error("Password reset error:", error);
+      Alert.alert("Error", "Unable to send password reset email.");
+    } 
   };
 
 
@@ -171,7 +149,7 @@ export default function ProfileScreen() {
 
       {/* Options */}
       <View style={styles.optionsContainer}>
-        <TouchableOpacity style={styles.optionButton}>
+        <TouchableOpacity style={styles.optionButton} onPress={handleChangePassword}>
           <Text style={styles.optionText}>Change Password</Text>
           <Feather name="lock" size={18} color="#6b7280" />
         </TouchableOpacity>
@@ -192,57 +170,6 @@ export default function ProfileScreen() {
         </TouchableOpacity>
       </View>
 
-      {/* Password Change Modal */}
-      <Modal
-      animationType="slide"
-      transparent={true}
-      visible={modalVisible}
-      onRequestClose={() => {
-        if (!changingPassword) setModalVisible(false)
-      }}>
-        <View style={styles.modalBackground}>
-          <View style={styles.modalContainer}>
-            <Text style={{fontWeight: 'bold', marginBottom: 10}}>
-              Change Password
-            </Text>
-
-            <TextInput
-            placeholder="New Password"
-            secureTextEntry
-            value={newPassword}
-            onChangeText={setNewPassword}
-            style={styles.input}
-            editable={!changingPassword}
-            />
-
-            <TextInput
-            placeholder="Confirm Password"
-            secureTextEntry
-            value={confirmPassword}
-            onChangeText={setConfirmPassword}
-            style={styles.input}
-            editable={!changingPassword}
-            />
-
-            <View style={{ marginTop: 10 }}>
-              {changingPassword ? (
-                <ActivityIndicator size='small' color='#a60fdc' />
-              ) : (
-                <>
-                <Button title='Confirm' onPress={onConfirmPress} />
-                <View style={{ height: 10 }} />
-                <Button
-                title="Cancel"
-                color="red"
-                onPressIn={() => setModalVisible(false)}
-                />
-                </>
-              )
-              )}
-              </View>
-            </View>
-        </View>
-      </Modal>
 
 
 
@@ -287,7 +214,7 @@ const styles = StyleSheet.create({
     borderColor: "#e5e7eb",
   },
   optionText: { fontSize: 16, color: "#374151" },
-  modalBackground: { flex: 1, backgroundColor: '#000000aa', justifyContent: 'center', alignItems: 'center' },
+  modalBackground: { flex: 1, backgroundColor: "rgba(0,0,0,0.5)", justifyContent: 'center', alignItems: 'center' },
   modalContainer: { width: '85%', backgroundColor: '#000000aa', justifyContent: 'center', alignItems: 'center'},
   input:{ borderBottomWidth: 1, borderColor: '#ccc', marginBottom: 15, paddingVertical: 8, paddingHorizontal: 5 },
 

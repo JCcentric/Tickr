@@ -1,31 +1,50 @@
-import { Platform, StyleSheet, Text, TextInput, TouchableOpacity, View, Image, ActivityIndicator, TouchableWithoutFeedback, Keyboard, Alert } from 'react-native';
+import { 
+  Platform, 
+  StyleSheet, 
+  Text, 
+  TextInput, 
+  TouchableOpacity, 
+  View, 
+  Image, 
+  ActivityIndicator, 
+  TouchableWithoutFeedback, 
+  Keyboard 
+} from 'react-native';
 import React, { useState } from 'react';
 import { useRouter, useLocalSearchParams } from 'expo-router';
 import { auth, db } from '@/firebaseConfig';
 import * as ImagePicker from 'expo-image-picker';
-import { doc, updateDoc } from 'firebase/firestore';
+import { doc, Timestamp, updateDoc } from 'firebase/firestore';
 import { Ionicons } from '@expo/vector-icons';
-import DateTimePicker from '@react-native-community/datetimepicker';
 import { getDownloadURL, getStorage, ref, uploadBytes, deleteObject } from 'firebase/storage';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 export default function EditTickr() {
   const router = useRouter();
   const storage = getStorage();
   const user = auth.currentUser;
 
-  // ✅ Pull params passed from TickrDetails
-  const { id, title: initialTitle = '', description: initialDescription = '', date: initialDate = '', imageUrl: initialImageUrl = '' } = useLocalSearchParams();
+  // Grab params passed from TickrCard
+  const { 
+    id, 
+    title: initialTitle = '', 
+    description: initialDescription = '', 
+    date: initialDate = '', 
+    imageUrl: rawImageUrl = '' 
+  } = useLocalSearchParams();
+
+  // Normalize imageUrl param
+  const initialImageUrl = Array.isArray(rawImageUrl) ? rawImageUrl[0] : rawImageUrl;
 
   const [title, setTitle] = useState(initialTitle as string);
   const [description, setDescription] = useState(initialDescription as string);
   const [date, setDate] = useState(initialDate ? new Date(initialDate as string) : new Date());
-  const [image, setImage] = useState<string | null>(null); // new image URI if user picks
-  const [existingImageUrl, setExistingImageUrl] = useState(initialImageUrl as string); // existing image from Firestore
-  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [image, setImage] = useState<string | null>(null); // only store NEW image if picked
+  const [isDatePickervisible, setDatePickerVisible] = useState(false); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // ✅ Pick a new image
+  // Pick new image
   const pickImage = async () => {
     const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (!permissionResult.granted) {
@@ -38,55 +57,48 @@ export default function EditTickr() {
       aspect: [4, 3],
       quality: 0.8,
     });
+
     if (!result.canceled) {
       setImage(result.assets[0].uri);
     }
   };
 
-  // ✅ Upload new image to Firebase Storage
+  // Upload to Firebase
   const uploadImage = async (uri: string): Promise<string> => {
-    try {
-      const response = await fetch(uri);
-      const blob = await response.blob();
-      const fileName = `${encodeURIComponent(user?.uid || 'unknown')}-${Date.now()}.jpg`;
-      const storageRef = ref(storage, `tickrImages/${fileName}`);
-      await uploadBytes(storageRef, blob, { contentType: 'image/jpeg' });
-      const downloadURL = await getDownloadURL(storageRef);
-      return downloadURL;
-    } catch (error) {
-      console.error('Image upload failed:', error);
-      throw new Error('Image upload failed');
-    }
+    const response = await fetch(uri);
+    const blob = await response.blob();
+    const fileName = `${encodeURIComponent(user?.uid || 'unknown')}-${Date.now()}.jpg`;
+    const storageRef = ref(storage, `tickrImages/${fileName}`);
+    await uploadBytes(storageRef, blob, { contentType: 'image/jpeg' });
+    return await getDownloadURL(storageRef);
   };
 
-  // ✅ Delete old image from Firebase Storage
+  // Delete old Firebase image if replaced
   const deleteOldImage = async (url: string) => {
     try {
       const imageRef = ref(storage, url);
       await deleteObject(imageRef);
-      console.log('Old image deleted successfully');
     } catch (error) {
-      console.warn('Could not delete old image (might not exist):', error);
+      console.warn('Old image delete failed (may not exist):', error);
     }
   };
 
-  // ✅ Update Tickr in Firestore
+  // Save updates
   const updateTickr = async () => {
     if (!title.trim()) {
       setError('Title is required');
       return;
     }
+
     setError('');
     setLoading(true);
 
     try {
-      let updatedImageUrl = existingImageUrl;
+      let updatedImageUrl = initialImageUrl; // keep the original if no new image
 
-      // If user picked a new image → upload it and delete old one
       if (image) {
-        if (existingImageUrl) {
-          await deleteOldImage(existingImageUrl);
-        }
+        // If user picked a new one → delete old and upload new
+        if (initialImageUrl) await deleteOldImage(initialImageUrl);
         updatedImageUrl = await uploadImage(image);
       }
 
@@ -94,14 +106,13 @@ export default function EditTickr() {
       await updateDoc(tickrDoc, {
         title,
         description,
-        date: date.toISOString(),
-        imageUrl: updatedImageUrl,
+        date: Timestamp.fromDate(date),
+        imageUrl: updatedImageUrl || null,
       });
 
       router.back();
-      router.back();
-    } catch (error) {
-      console.error('Error updating Tickr:', error);
+    } catch (e) {
+      console.error('Update Tickr failed:', e);
       setError('Failed to update Tickr. Please try again.');
     } finally {
       setLoading(false);
@@ -130,39 +141,37 @@ export default function EditTickr() {
           onChangeText={setDescription}
         />
 
-        {/* Date Picker */}
-        <TouchableOpacity style={styles.dateButton} onPress={() => setShowDatePicker(true)}>
+        {/* Date */}
+        <TouchableOpacity style={styles.dateButton} onPress={() => setDatePickerVisible(true)}>
           <Ionicons name="calendar" size={20} color="#fff" />
           <Text style={styles.dateText}>Date: {date.toDateString()}</Text>
         </TouchableOpacity>
-        {showDatePicker && (
-          <DateTimePicker
-            value={date}
-            mode="date"
-            display={Platform.OS === 'ios' ? 'spinner' : 'default'}
-            onChange={(event, selectedDate) => {
-              setShowDatePicker(false);
-              if (selectedDate) {
-                setDate(selectedDate);
-              }
-            }}
-          />
-        )}
+        <DateTimePickerModal
+          textColor="#000"
+          isVisible={isDatePickervisible}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          date={date}
+          onConfirm={(selectedDate) => { setDatePickerVisible(false); setDate(selectedDate); }}
+          onCancel={() => setDatePickerVisible(false)}
+        />
 
-        {/* Image */}
+        {/* Image Picker */}
         <TouchableOpacity style={styles.imageButton} onPress={pickImage}>
           <Ionicons name="image-outline" size={20} color="#fff" />
           <Text style={styles.imageText}>{image ? 'Change Image' : 'Change Existing Image'}</Text>
         </TouchableOpacity>
 
-        {/* Preview (new image OR existing) */}
-        {image ? (
-          <Image source={{ uri: image }} style={styles.previewImage} />
-        ) : existingImageUrl ? (
-          <Image source={{ uri: existingImageUrl }} style={styles.previewImage} />
-        ) : null}
+        {/* Show preview */}
+        {image || initialImageUrl ? (
+          <Image source={{ uri: image || initialImageUrl! }} style={styles.previewImage} />
+        ) : (
+          <View style={[styles.previewImage, { backgroundColor: "#ccc", justifyContent: "center", alignItems: "center" }]}>
+            <Ionicons name="image-outline" size={40} color="#666" />
+          </View>
+        )}
 
-        {/* Save Button */}
+        {/* Save */}
         <TouchableOpacity style={styles.saveButton} onPress={updateTickr} disabled={loading}>
           {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.saveText}>Update Tickr</Text>}
         </TouchableOpacity>

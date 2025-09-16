@@ -1,4 +1,4 @@
-import { Alert, Keyboard, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native'
+import { Alert, Keyboard, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native'
 import React from 'react'
 import { TextInput } from 'react-native-gesture-handler'
 import { auth } from '@/firebaseConfig'
@@ -74,7 +74,7 @@ const styles = StyleSheet.create({
         fontSize: 16,
         marginBottom: 20,
         textAlign: 'center',
-    }
+    },
     input: {
         flexDirection: "row",
         justifyContent: "space-between",

@@ -1,4 +1,4 @@
-import { Text, ActivityIndicator, StyleSheet, View, TouchableOpacity, FlatList, TextInput, Alert, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { Text, ActivityIndicator, StyleSheet, View, TouchableOpacity, FlatList, TextInput, Image, TouchableWithoutFeedback, Keyboard, Animated } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Swipeable } from 'react-native-gesture-handler';
 
@@ -6,8 +6,9 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/firebaseConfig';
 import { useRouter } from 'expo-router';
 import React, { useState, useEffect } from 'react';
-import { collection, onSnapshot, query, orderBy, deleteDoc, doc } from 'firebase/firestore';
+import { collection, onSnapshot, query, orderBy, deleteDoc, doc, getDoc } from 'firebase/firestore';
 import { getStorage, ref, deleteObject } from "firebase/storage";
+import { LinearGradient } from 'expo-linear-gradient';
 import TickrCard from '@/components/TickrCard';
 
 export default function HomeScreen() {
@@ -16,6 +17,30 @@ export default function HomeScreen() {
   const [tickrs, setTickrs] = useState<any[]>([]);
   const [filteredTickrs, setFilteredTickrs] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [profilePic, setProfilePic] = useState<string | null>(null);
+  const scaleValue = new Animated.Value(1);
+
+  useEffect(() => {
+    const fetchProfilePicture = async () => {
+      const user = auth.currentUser;
+      if (!user) return;
+    
+      try {
+        const userRef = doc(db, "users", user.uid);
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists()) {
+          const data = userSnap.data();
+          if (data.profilePicture) {
+            setProfilePic(data.profilePicture);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching profile picture:", err);
+      }
+    };
+  
+    fetchProfilePicture();
+  }, []);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -27,6 +52,14 @@ export default function HomeScreen() {
 
     return unsubscribe;
   }, []);
+
+  const handlePressIn = () => {
+    Animated.spring(scaleValue, {toValue: 1.05, useNativeDriver: true}).start();
+  }
+
+  const handlePressOut = () => {
+    Animated.spring(scaleValue, { toValue: 1, useNativeDriver: true }).start();
+  };
 
 
 
@@ -197,17 +230,25 @@ export default function HomeScreen() {
             )}
           />
         )}
-  
-        <TouchableOpacity style={styles.fab} onPress={() => router.push("/CreateTickr")}>
-          <Ionicons name="add" size={28} color={'#fff'}></Ionicons>
-        </TouchableOpacity>
+        {/* Floating Action Button - Create Tickr */}
+        <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+          <TouchableOpacity onPressIn={handlePressIn} onPressOut={handlePressOut} style={styles.fab} onPress={() => router.push("/CreateTickr")}>
+            <Ionicons name="add" size={28} color={'#fff'}></Ionicons>
+          </TouchableOpacity>
+        </Animated.View>
+        
       
       {/*Profile Button*/} 
         <TouchableOpacity style={styles.profileIcon} onPress={() => router.push("/profile")}>
-                <Ionicons name="person-circle-outline" size={45} color="#888" />
+          {profilePic ? (
+            <Image 
+            source={{ uri: profilePic }} 
+            style={styles.profileImage}
+            />
+          ) : ( 
+              <Ionicons name="person-circle-outline" size={45} color="#888" />
+          )}
         </TouchableOpacity>
-
-        
       </View>
     </TouchableWithoutFeedback>
   );
@@ -223,7 +264,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     bottom: 30,
     right: 30,
-    backgroundColor: "#a60fdc",
+    backgroundColor: "#0B6162",
     width: 60,
     height: 60,
     borderRadius: 30,
@@ -270,6 +311,17 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: 50,
     right: 20,
+  },
+  profileImage: { 
+    width: 45,
+    height: 45,
+    borderRadius: 25,
+    borderWidth: 2,
+    borderColor: '#00bfa5',
+    shadowColor: '#00bfa5',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
   },
 });
 

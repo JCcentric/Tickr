@@ -114,6 +114,7 @@ export default function CreateTickr() {
             <TextInput
                 style={styles.input}
                 placeholder="Tickr Title"
+                placeholderTextColor={"#888"}
                 value={title}
                 onChangeText={setTitle}
             />
@@ -121,6 +122,7 @@ export default function CreateTickr() {
             <TextInput
                 style={styles.input}
                 placeholder="Description (optional)"
+                placeholderTextColor={"#888"}
                 value={description}
                 onChangeText={setDescription}
             />
@@ -162,7 +164,7 @@ export default function CreateTickr() {
 const styles = StyleSheet.create({
     container: { flex: 1, padding: 20, backgroundColor: '#fff' },
     title: { fontSize: 24, fontWeight: 'bold', marginTop: 50, marginBottom: 20, textAlign: 'center' },
-    input: { borderWidth: 1, borderColor: '#ccc', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 12, marginBottom: 12, fontSize: 16 },
+    input: { borderWidth: 1, borderColor: '#acacacff', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 12, marginBottom: 12, fontSize: 16 },
     error: { color: 'red', textAlign: 'center', marginBottom: 10 },
     dateButton: { flexDirection: 'row', alignItems: 'center', backgroundColor: '#6c63ff', padding: 12, borderRadius: 8, marginBottom: 12 },
     dateText: { color: '#fff', fontSize: 16 },

@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   timerContainer: {
-    backgroundColor: '#a60fdc',
+    backgroundColor: '#0B6162',
     paddingVertical: 6,
     paddingHorizontal: 12,
     borderRadius: 8,

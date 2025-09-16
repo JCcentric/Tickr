@@ -6,16 +6,15 @@ import {
   Image,
   StyleSheet,
   Alert,
-  ActivityIndicator,
-  Modal,
-  Button
+  ActivityIndicator
 } from "react-native";
 import { Feather } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
-import { auth, db } from "@/firebaseConfig";
-import { doc, getDoc } from "firebase/firestore";
+import { auth, db, storage } from "@/firebaseConfig";
+import { collection, deleteDoc, doc, getDoc, getDocs, setDoc } from "firebase/firestore";
 import {getAuth, updatePassword, sendPasswordResetEmail} from "firebase/auth";
-import { TextInput } from "react-native-gesture-handler";
+import { deleteObject, getDownloadURL, ref, uploadBytes } from "firebase/storage";
+import * as ImagePicker from "expo-image-picker";
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -68,32 +67,86 @@ export default function ProfileScreen() {
   };
 
 
-  //Delete Account Function
-  const handleDeleteAccount = () => {
-    Alert.alert(
-      "Delete Account",
-      "Are you sure you want to permanently delete your account? This action cannot be undone.",
-      [
-        { text: "Cancel", style: "cancel" },
-        {
-          text: "Delete",
-          style: "destructive",
-          onPress: async () => {
-            try {
-              const user = auth.currentUser;
-              if (user) {
-                await user.delete();
-                router.replace("/login");
+// Delete Account Function
+const handleDeleteAccount = () => {
+  Alert.alert(
+    "Delete Account",
+    "Are you sure you want to permanently delete your account? This action cannot be undone.",
+    [
+      { text: "Cancel", style: "cancel" },
+      {
+        text: "Delete",
+        style: "destructive",
+        onPress: async () => {
+          try {
+            const user = auth.currentUser;
+            if (!user) return;
+
+            const uid = user.uid;
+
+            // Get User doc reference from Firestore
+            const userRef = doc(db, "users", uid);
+            const userSnap = await getDoc(userRef);
+
+            if (userSnap.exists()) {
+              const userData = userSnap.data();
+
+              // Delete profile picture if it exists
+              if (userData.profilePicture) {
+                try {
+                  const profilePicRef = ref(storage, userData.profilePicture);
+                  await deleteObject(profilePicRef);
+                  console.log("Profile picture deleted from storage.");
+                } catch (err) {
+                  console.log(
+                    "No profile picture to delete or error deleting:",
+                    err instanceof Error ? err.message : err
+                  );
+                }
               }
-            } catch (error) {
-              console.error("Delete account error:", error);
-              Alert.alert("Error", "Unable to delete account.");
+
+              // Delete all tickrs and their associated images
+              const tickrsRef = collection(db, "users", uid, "tickrs");
+              const tickrsSnap = await getDocs(tickrsRef);
+
+              const tickrDeletePromises = tickrsSnap.docs.map(async (tickrDoc) => {
+                const tickrData = tickrDoc.data();
+                if (tickrData.imagePath) {
+                  try {
+                    const tickrImageRef = ref(storage, tickrData.imagePath);
+                    await deleteObject(tickrImageRef);
+                    console.log(`Tickr image ${tickrData.imagePath} deleted from storage.`);
+                  } catch (err) {
+                    console.error("Error deleting tickr image:", err);
+                  }
+                }
+                await deleteDoc(tickrDoc.ref);
+              });
+
+              await Promise.all(tickrDeletePromises);
+              console.log("All tickrs deleted.");
+
+              // Delete user document from Firestore
+              await deleteDoc(userRef);
+              console.log("User document deleted from Firestore.");
             }
-          },
+
+            // Delete user from Firebase Auth last
+            await user.delete();
+            console.log("User account deleted from Auth.");
+
+            // Route back to login page
+            router.replace("/login");
+          } catch (err) {
+            console.error("Error deleting account:", err);
+            Alert.alert("Error", "There was an issue deleting your account. Please try again.");
+          }
         },
-      ]
-    );
-  };
+      },
+    ]
+  );
+};
+
 
 
   //Change Password function
@@ -114,6 +167,72 @@ export default function ProfileScreen() {
 
 
 
+  //Set Profile picture function
+  const handleChangeProfilePicture = async () => {
+    try {
+      const user = auth.currentUser;
+      if (!user) return;
+
+      // Ask for permission
+      const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (!permissionResult.granted) {
+        Alert.alert("Permission required", "You need to allow access to your photos.");
+        return;
+      }
+
+      // Pick an image
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 0.8,
+      });
+
+      if (result.canceled) return;
+
+      const uri = result.assets[0].uri;
+
+      // Convert to blob
+      const response = await fetch(uri);
+      const blob = await response.blob();
+
+      const imagePath = `profilePictures/${user.uid}/profile.jpg`;
+      const storageRef = ref(storage, imagePath);
+
+      // Delete old profile picture if it exists
+      if (userData?.profilePicture) {
+        try {
+          const oldRef = ref(storage, userData.profilePicture);
+          await deleteObject(oldRef);
+          console.log("Old profile picture deleted.");
+        } catch (err) {
+          console.log("No old profile picture to delete or error deleting:", err);
+        }
+      }
+
+      // Upload new image
+      await uploadBytes(storageRef, blob);
+
+      // Get download URL
+      const downloadURL = await getDownloadURL(storageRef);
+
+      // Update Firestore
+      const userRef = doc(db, "users", user.uid);
+      await setDoc(userRef, { profilePicture: downloadURL }, { merge: true });
+
+      // Update local state to refresh UI immediately
+      setUserData((prev: any) => ({ ...prev, profilePicture: downloadURL }));
+
+      Alert.alert("Success", "Profile picture updated!");
+    } catch (err) {
+      console.error("Error updating profile picture:", err);
+      Alert.alert("Error", "Unable to update profile picture.");
+    }
+  };
+
+
+
+
   
 
   if (loading) {
@@ -128,11 +247,11 @@ export default function ProfileScreen() {
     <View style={styles.container}>
       {/* Profile Picture */}
       <View style={styles.profileSection}>
-        <TouchableOpacity style={styles.profilePicContainer}>
+        <TouchableOpacity style={styles.profilePicContainer} onPress={handleChangeProfilePicture}>
           <Image
             source={{
               uri:
-                userData?.profilePic ||
+                userData?.profilePicture ||
                 "https://via.placeholder.com/150/cccccc/000000?text=Profile",
             }}
             style={styles.profilePic}

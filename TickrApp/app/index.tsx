@@ -1,4 +1,4 @@
-import { Text, ActivityIndicator, StyleSheet, View, TouchableOpacity, FlatList, TextInput, Image, TouchableWithoutFeedback, Keyboard, Animated } from 'react-native';
+import { Text, ActivityIndicator, StyleSheet, View, TouchableOpacity, FlatList, TextInput, Image, TouchableWithoutFeedback, Keyboard, Animated, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Swipeable } from 'react-native-gesture-handler';
 
@@ -21,25 +21,24 @@ export default function HomeScreen() {
   const scaleValue = new Animated.Value(1);
 
   useEffect(() => {
-    const fetchProfilePicture = async () => {
-      const user = auth.currentUser;
-      if (!user) return;
-    
-      try {
-        const userRef = doc(db, "users", user.uid);
-        const userSnap = await getDoc(userRef);
-        if (userSnap.exists()) {
-          const data = userSnap.data();
-          if (data.profilePicture) {
-            setProfilePic(data.profilePicture);
-          }
-        }
-      } catch (err) {
-        console.error("Error fetching profile picture:", err);
+  const user = auth.currentUser;
+  if (!user) return;
+
+  const userRef = doc(db, "users", user.uid);
+
+  // Subscribe to changes in the user document
+  const unsubscribe = onSnapshot(userRef, (docSnap) => {
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      if (data.profilePicture) {
+        setProfilePic(data.profilePicture);
       }
-    };
-  
-    fetchProfilePicture();
+    }
+  }, (err) => {
+    console.error("Error fetching profile picture:", err);
+  });
+
+    return () => unsubscribe();
   }, []);
 
   useEffect(() => {
@@ -177,9 +176,22 @@ export default function HomeScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <View style={styles.container}>
-        <Text style={styles.unclassBanner}>Unclassified</Text>
+      <SafeAreaView style={styles.container}>
+
+      
         <Text style={styles.title}>Your Tickrs</Text>
+
+        {/*Profile Button*/} 
+        <TouchableOpacity style={styles.profileIcon} onPress={() => router.push("/profile")}>
+          {profilePic ? (
+            <Image 
+            source={{ uri: profilePic }} 
+            style={styles.profileImage}
+            />
+          ) : ( 
+              <Ionicons name="person-circle-outline" size={45} color="#888" />
+          )}
+        </TouchableOpacity>
     
         {/* Search Bar */}
         <View style={styles.searchContainer}>
@@ -199,67 +211,57 @@ export default function HomeScreen() {
         </View>
         
         {/* Tickr List */}
-        {filteredTickrs.length === 0 ? (
-          <Text style={styles.noTickr}>No tickrs found.</Text>
-        ) : (
-          <FlatList
-            style={styles.flatList}
-            data={filteredTickrs}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <Swipeable renderRightActions={() => renderRightActions(item.id, item.imagePath)}>
-                <TickrCard
-                  title={item.title}
-                  description={item.description}
-                  date={item.date}
-                  image={item.imageUrl}
-                  onPress={() =>
-                    router.push({
-                      pathname: '/TickrDetails',
-                      params: {
-                        id: item.id,
-                        title: item.title,
-                        description: item.description,
-                        date: item.date,
-                        image: item.imageUrl || ''
-                      }
-                    })
-                  }
-                />
-              </Swipeable>
-            )}
-          />
-        )}
+        <View style={{ flex: 1 }}>
+          {filteredTickrs.length === 0 ? (
+            <Text style={styles.noTickr}>No tickrs found.</Text>
+          ) : (
+            <FlatList
+              style={styles.flatList}
+              data={filteredTickrs}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <Swipeable renderRightActions={() => renderRightActions(item.id, item.imagePath)}>
+                  <TickrCard
+                    title={item.title}
+                    description={item.description}
+                    date={item.date}
+                    image={item.imageUrl}
+                    onPress={() =>
+                      router.push({
+                        pathname: '/TickrDetails',
+                        params: {
+                          id: item.id,
+                          title: item.title,
+                          description: item.description,
+                          date: item.date,
+                          image: item.imageUrl || ''
+                        }
+                      })
+                    }
+                  />
+                </Swipeable>
+              )}
+            />
+          )}
+        </View>
         {/* Floating Action Button - Create Tickr */}
         <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
           <TouchableOpacity onPressIn={handlePressIn} onPressOut={handlePressOut} style={styles.fab} onPress={() => router.push("/CreateTickr")}>
             <Ionicons name="add" size={28} color={'#fff'}></Ionicons>
           </TouchableOpacity>
         </Animated.View>
-        
       
-      {/*Profile Button*/} 
-        <TouchableOpacity style={styles.profileIcon} onPress={() => router.push("/profile")}>
-          {profilePic ? (
-            <Image 
-            source={{ uri: profilePic }} 
-            style={styles.profileImage}
-            />
-          ) : ( 
-              <Ionicons name="person-circle-outline" size={45} color="#888" />
-          )}
-        </TouchableOpacity>
-      </View>
+      </SafeAreaView>
     </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, marginTop: 50, backgroundColor: "#f9f9f9" },
+  container: { flex: 1, padding: 15, backgroundColor: "#f9f9f9" },
   loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 20, textAlign: "center", color: '#000' },
+  title: { fontSize: 24, marginTop: 10, fontWeight: "bold", textAlign: "center", color: '#000' },
   noTickr: { textAlign: "center", marginTop: 20, color: "gray" },
-  flatList: { flex: 1, marginTop: 20 },
+  flatList: { flex: 1, marginTop: 20, marginHorizontal: 15 },
   fab: {
     position: "absolute",
     bottom: 30,
@@ -290,6 +292,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 10,
     paddingVertical: 8,
     marginBottom: 16,
+    marginTop: 20,
+    marginHorizontal: 20,
     elevation: 2
   },
   searchInput: {
@@ -297,20 +301,11 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: "#000"
   },
-  unclassBanner: {
-    backgroundColor: '#50df24ff',
-    color: '#000',
-    textAlign: 'center',
-    width: '100%',
-    paddingVertical: 3,
-    borderRadius: 8,
-    marginBottom: 15,
-    fontWeight: 'bold'
-  },
   profileIcon: {
     position: "absolute",
-    top: 50,
+    top: 55,
     right: 20,
+    padding: 5,
   },
   profileImage: { 
     width: 45,

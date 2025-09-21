@@ -2,7 +2,7 @@
   "expo": {
     "name": "TICKR",
     "slug": "TickrApp",
-    "version": "1.0.0",
+    "version": "1.1.1",
     "orientation": "portrait",
     "icon": "./assets/images/TICKR_Icon.png",
     "scheme": "tickrapp",
@@ -13,7 +13,7 @@
     },
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "1.0.0",
+      "buildNumber": "1.1.1",
       "bundleIdentifier": "com.jccentric.TickrApp"
     },
     "android": {
@@ -22,7 +22,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "versionCode": 1,
+      "versionCode": 2,
       "package": "com.jccentric.TickrApp",
       "compileSdkVersion": 36,
       "targetSdkVersion": 36,
@@ -38,7 +38,7 @@
       [
         "expo-splash-screen",
         {
-          "image": "./assets/images/splash-icon.png",
+          "image": "./assets/images/TICKR_Icon.png",
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
@@ -55,7 +55,7 @@
       }
     },
     "owner": "jccentric",
-    "runtimeVersion": "1.0.0",
+    "runtimeVersion": "1.1.1",
     "updates": {
       "url": "https://u.expo.dev/eaaf8cc9-13a8-499b-afe8-e026a1cd62f0"
     }

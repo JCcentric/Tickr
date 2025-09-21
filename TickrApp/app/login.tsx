@@ -1,4 +1,4 @@
-import { View, StyleSheet, Text, KeyboardAvoidingView, Platform, TextInput, ActivityIndicator, Button, TouchableOpacity, Keyboard, TouchableWithoutFeedback } from 'react-native'
+import { View, StyleSheet, Text, KeyboardAvoidingView, Platform, TextInput, ActivityIndicator, Button, TouchableOpacity, Keyboard, TouchableWithoutFeedback, Image } from 'react-native'
 import React from 'react'
 import { useRouter } from 'expo-router';
 import { FirebaseError } from 'firebase/app';
@@ -63,6 +63,8 @@ export default function LoginScreen() {
         style={{flex: 1 }}
         >
             <View style={styles.container}>
+                <Image source = {{ uri: '../assets/tickr_logo.png' }} style = {{ width: 25, height: 25 }} />
+                <Image source = {{ uri: '../assets/login_clock_bg.jpeg' }} style = {{ width: '100%', height: '100%' }}/>
                 <Text style={styles.title}>Welcome To Tickr</Text>
     
                 {error ? <Text style={styles.error}>{error}</Text> : null}

@@ -176,6 +176,7 @@ export default function HomeScreen() {
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <LinearGradient colors ={['#004d59', '#012d34']} style = {{flex: 1}}>
       <SafeAreaView style={styles.container}>
 
       
@@ -252,12 +253,13 @@ export default function HomeScreen() {
         </Animated.View>
       
       </SafeAreaView>
+      </LinearGradient>
     </TouchableWithoutFeedback>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 15, backgroundColor: "#f9f9f9" },
+  container: { flex: 1, padding: 15 },
   loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
   title: { fontSize: 24, marginTop: 10, fontWeight: "bold", textAlign: "center", color: '#000' },
   noTickr: { textAlign: "center", marginTop: 20, color: "gray" },

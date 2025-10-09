@@ -4,6 +4,8 @@ import { auth } from "../firebaseConfig"; // your firebase config file
 import { Stack } from "expo-router";
 import { ActivityIndicator, View, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import "../global.css";
+import "react-datepicker/dist/react-datepicker.css";
 
 
 

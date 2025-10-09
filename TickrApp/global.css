@@ -1,0 +1,13 @@
+/* Global CSS */
+
+.react-datepicker-popper{
+    z-index: 99999 !important;
+}
+
+.react-datepicker {
+    z-index: 99999 !important;
+}
+
+.react-datepicker__portal {
+    z-index: 99999 !important;
+}

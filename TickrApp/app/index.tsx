@@ -1,4 +1,4 @@
-import { Text, ActivityIndicator, StyleSheet, View, TouchableOpacity, FlatList, TextInput, Image, TouchableWithoutFeedback, Keyboard, Animated, SafeAreaView } from 'react-native';
+import { Text, Platform, useWindowDimensions, ActivityIndicator, StyleSheet, View, TouchableOpacity, FlatList, TextInput, Image, TouchableWithoutFeedback, Keyboard, Animated, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Swipeable } from 'react-native-gesture-handler';
 
@@ -19,6 +19,11 @@ export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const scaleValue = new Animated.Value(1);
+
+  // Determine screen size for responsive design for web
+  const { width } = useWindowDimensions();
+  const isWeb = Platform.OS === 'web';
+  const isLargeScreen = isWeb && width > 800;
 
   useEffect(() => {
   const user = auth.currentUser;
@@ -175,93 +180,173 @@ export default function HomeScreen() {
 
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-      <LinearGradient colors ={['#004d59', '#012d34']} style = {{flex: 1}}>
-      <SafeAreaView style={styles.container}>
 
-      
+    //Web View
+    Platform.OS === "web" ? (
+      <View style = {[styles.container, styles.webContainer]}>
+
         <Text style={styles.title}>Your Tickrs</Text>
 
-        {/*Profile Button*/} 
-        <TouchableOpacity style={styles.profileIcon} onPress={() => router.push("/profile")}>
-          {profilePic ? (
-            <Image 
-            source={{ uri: profilePic }} 
-            style={styles.profileImage}
-            />
-          ) : ( 
-              <Ionicons name="person-circle-outline" size={45} color="#888" />
-          )}
-        </TouchableOpacity>
-    
-        {/* Search Bar */}
-        <View style={styles.searchContainer}>
-          <Ionicons name="search-outline" size={20} color="#888" style={{ marginRight: 8 }} />
-          <TextInput
-            style={styles.searchInput}
-            placeholder="Search tickrs..."
-            placeholderTextColor="#aaa"
-            value={searchQuery}
-            onChangeText={handleSearch}
-          />
-          {searchQuery.length > 0 && (
-            <TouchableOpacity onPress={clearSearch}>
-              <Ionicons name="close-circle" size={20} color="#888" />
-            </TouchableOpacity>
-          )}
-        </View>
-        
-        {/* Tickr List */}
-        <View style={{ flex: 1 }}>
-          {filteredTickrs.length === 0 ? (
-            <Text style={styles.noTickr}>No tickrs found.</Text>
-          ) : (
-            <FlatList
-              style={styles.flatList}
-              data={filteredTickrs}
-              keyExtractor={(item) => item.id}
-              renderItem={({ item }) => (
-                <Swipeable renderRightActions={() => renderRightActions(item.id, item.imagePath)}>
-                  <TickrCard
-                    title={item.title}
-                    description={item.description}
-                    date={item.date}
-                    image={item.imageUrl}
-                    onPress={() =>
-                      router.push({
-                        pathname: '/TickrDetails',
-                        params: {
-                          id: item.id,
-                          title: item.title,
-                          description: item.description,
-                          date: item.date,
-                          image: item.imageUrl || ''
-                        }
-                      })
-                    }
-                  />
-                </Swipeable>
-              )}
-            />
-          )}
-        </View>
-        {/* Floating Action Button - Create Tickr */}
-        <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
-          <TouchableOpacity onPressIn={handlePressIn} onPressOut={handlePressOut} style={styles.fab} onPress={() => router.push("/CreateTickr")}>
-            <Ionicons name="add" size={28} color={'#fff'}></Ionicons>
+          {/*Profile Button*/} 
+          <TouchableOpacity style={styles.profileIconWeb} onPress={() => router.push("/profile")}>
+            {profilePic ? (
+              <Image 
+              source={{ uri: profilePic }} 
+              style={styles.profileImageWeb}
+              />
+            ) : ( 
+                <Ionicons name="person-circle-outline" size={45} color="#888" />
+            )}
           </TouchableOpacity>
-        </Animated.View>
-      
-      </SafeAreaView>
-      </LinearGradient>
-    </TouchableWithoutFeedback>
+          
+          {/* Search Bar */}
+          <View style={styles.searchContainer}>
+            <Ionicons name="search-outline" size={20} color="#888" style={{ marginRight: 8 }} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search tickrs..."
+              placeholderTextColor="#aaa"
+              value={searchQuery}
+              onChangeText={handleSearch}
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={clearSearch}>
+                <Ionicons name="close-circle" size={20} color="#888" />
+              </TouchableOpacity>
+            )}
+          </View>
+          
+          {/* Tickr List */}
+          <View style={{ flex: 1 }}>
+            {filteredTickrs.length === 0 ? (
+              <Text style={styles.noTickr}>No tickrs found.</Text>
+            ) : (
+              <FlatList
+                style={styles.flatList}
+                data={filteredTickrs}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <Swipeable renderRightActions={() => renderRightActions(item.id, item.imagePath)}>
+                    <TickrCard
+                      title={item.title}
+                      description={item.description}
+                      date={item.date}
+                      image={item.imageUrl}
+                      onPress={() =>
+                        router.push({
+                          pathname: '/TickrDetails',
+                          params: {
+                            id: item.id,
+                            title: item.title,
+                            description: item.description,
+                            date: item.date,
+                            image: item.imageUrl || ''
+                          }
+                        })
+                      }
+                    />
+                  </Swipeable>
+                )}
+              />
+            )}
+          </View>
+          {/* Floating Action Button - Create Tickr */}
+          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+            <TouchableOpacity onPressIn={handlePressIn} onPressOut={handlePressOut} style={styles.fab} onPress={() => router.push("/CreateTickr")}>
+              <Ionicons name="add" size={28} color={'#fff'}></Ionicons>
+            </TouchableOpacity>
+          </Animated.View>
+      </View>
+    ) : (
+      //Mobile view
+      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+        <LinearGradient colors ={['#004d59', '#012d34']} style = {{flex: 1}}>
+        <SafeAreaView style={[styles.container, isWeb && styles.webContainer]}>
+
+
+          <Text style={styles.title}>Your Tickrs</Text>
+
+          {/*Profile Button*/} 
+          <TouchableOpacity style={styles.profileIcon} onPress={() => router.push("/profile")}>
+            {profilePic ? (
+              <Image 
+              source={{ uri: profilePic }} 
+              style={styles.profileImage}
+              />
+            ) : ( 
+                <Ionicons name="person-circle-outline" size={45} color="#888" />
+            )}
+          </TouchableOpacity>
+          
+          {/* Search Bar */}
+          <View style={styles.searchContainer}>
+            <Ionicons name="search-outline" size={20} color="#888" style={{ marginRight: 8 }} />
+            <TextInput
+              style={styles.searchInput}
+              placeholder="Search tickrs..."
+              placeholderTextColor="#aaa"
+              value={searchQuery}
+              onChangeText={handleSearch}
+            />
+            {searchQuery.length > 0 && (
+              <TouchableOpacity onPress={clearSearch}>
+                <Ionicons name="close-circle" size={20} color="#888" />
+              </TouchableOpacity>
+            )}
+          </View>
+          
+          {/* Tickr List */}
+          <View style={{ flex: 1 }}>
+            {filteredTickrs.length === 0 ? (
+              <Text style={styles.noTickr}>No tickrs found.</Text>
+            ) : (
+              <FlatList
+                style={styles.flatList}
+                data={filteredTickrs}
+                keyExtractor={(item) => item.id}
+                renderItem={({ item }) => (
+                  <Swipeable renderRightActions={() => renderRightActions(item.id, item.imagePath)}>
+                    <TickrCard
+                      title={item.title}
+                      description={item.description}
+                      date={item.date}
+                      image={item.imageUrl}
+                      onPress={() =>
+                        router.push({
+                          pathname: '/TickrDetails',
+                          params: {
+                            id: item.id,
+                            title: item.title,
+                            description: item.description,
+                            date: item.date,
+                            image: item.imageUrl || ''
+                          }
+                        })
+                      }
+                    />
+                  </Swipeable>
+                )}
+              />
+            )}
+          </View>
+          {/* Floating Action Button - Create Tickr */}
+          <Animated.View style={{ transform: [{ scale: scaleValue }] }}>
+            <TouchableOpacity onPressIn={handlePressIn} onPressOut={handlePressOut} style={styles.fab} onPress={() => router.push("/CreateTickr")}>
+              <Ionicons name="add" size={28} color={'#fff'}></Ionicons>
+            </TouchableOpacity>
+          </Animated.View>
+          
+        </SafeAreaView>
+        </LinearGradient>
+      </TouchableWithoutFeedback>
+    )
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 15 },
+  container: { flex: 1, padding: 15, justifyContent: "flex-start" },
   loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
-  title: { fontSize: 24, marginTop: 10, fontWeight: "bold", textAlign: "center", color: '#000' },
+  title: { fontSize: Platform.OS === 'web' ? 40 : 24, marginTop: 10, fontWeight: "bold", textAlign: "center", color: '#000' },
   noTickr: { textAlign: "center", marginTop: 20, color: "gray" },
   flatList: { flex: 1, marginTop: 20, marginHorizontal: 15 },
   fab: {
@@ -320,5 +405,23 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.6,
     shadowRadius: 6,
   },
+  profileIconWeb: {
+    position: "absolute",
+    top: 20,
+    right: 35,
+    padding: 5,
+  },
+  profileImageWeb: {
+    width: 55,
+    height: 55,
+    borderRadius: 30,
+    borderWidth: 2,
+    borderColor: '#00bfa5',
+    shadowColor: '#00bfa5',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.6,
+    shadowRadius: 6,
+  },
+  webContainer: { flex: 1, maxWidth: 800, alignSelf: "center", width: "100%", paddingHorizontal: 30},
 });
 

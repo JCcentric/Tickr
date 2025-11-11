@@ -61,6 +61,8 @@ export default function RootLayout() {
         )}
         {/* Included signup, forgot password, and all other screens*/}
         <Stack.Screen name="signup" />
+        <Stack.Screen name="pp" options={{presentation: 'modal', animation: 'slide_from_bottom', headerShown: false}}/> 
+        <Stack.Screen name="tos" options={{presentation: 'modal', animation: 'slide_from_bottom', headerShown: false}}/>
         <Stack.Screen name="forgotPassword" /> 
         <Stack.Screen name="+not-found" />
         <Stack.Screen name="TickrDetails" options={{presentation: 'modal', animation: 'slide_from_bottom', headerShown: false}} />

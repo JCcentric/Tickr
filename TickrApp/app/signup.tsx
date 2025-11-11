@@ -143,6 +143,24 @@ export default function SignUpPage() {
             <TouchableOpacity onPress={() => router.replace('/login')}>
                     <Text style={styles.link}>Already have an account? Login</Text>
             </TouchableOpacity>
+            
+            
+            
+            <View style={{ position: 'absolute', bottom: 80, width: '90%'}}>
+            <Text style={{textAlign: 'center', marginBottom: 10, fontSize: 15}}>By creating an account, you agree to the Terms of Service and the Privacy policy linked below.</Text>
+
+                <View style={{ flexDirection: 'row', justifyContent: 'center', gap: 20 }}>
+                    <TouchableOpacity onPress={() => router.push("/tos")}>
+                    <Text style={styles.link2}>Terms of Service</Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => router.push("/pp")}>
+                        <Text style={styles.link2}>Privacy Policy</Text>
+                    </TouchableOpacity>
+                </View>            
+                
+            </View>
+            
 
         </View>
     </TouchableWithoutFeedback>
@@ -157,5 +175,6 @@ const styles = StyleSheet.create({
     input: {height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 12, paddingHorizontal: 10, width: '100%', borderRadius: 5},
     title: {fontSize: 24, fontWeight: 'bold', marginBottom: 20},
     error: {color: 'red', marginBottom: 8, textAlign: 'center'},
-    link: { color: "blue", marginTop: 10, textAlign: "center" }
+    link: { color: "blue", marginTop: 10, textAlign: "center" },
+    link2: { color: "grey", marginTop: 10, textAlign: "center" }
 })

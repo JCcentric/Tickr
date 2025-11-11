@@ -111,8 +111,7 @@ export default function LoginScreen() {
             style={{flex: 1 }}
             >
                 <View style={styles.container}>
-                    <Image source = {{ uri: '../assets/tickr_logo.png' }} style = {{ width: 25, height: 25 }} />
-                    <Image source = {{ uri: '../assets/login_clock_bg.jpeg' }} style = {{ width: '100%', height: '100%' }}/>
+                    <Image source = {require('../assets/images/TICKR_Icon.png')} style = {styles.icon} />
                     <Text style={styles.title}>Welcome To Tickr</Text>
         
                     {error ? <Text style={styles.error}>{error}</Text> : null}
@@ -154,9 +153,11 @@ export default function LoginScreen() {
                         <Text style={styles.link}>Forgot Password?</Text>
                     </TouchableOpacity>
 
-
-                    <Text>Copyright © 2025 Jared Gilbert. All rights reserved.</Text>
-                    <Text>Unauthorized copying or distribution of this software, via any medium, is strictly prohibited.</Text>
+                    <View style={styles.copyrightContainer}>
+                        <Text style={styles.copyrightText}>Copyright © 2025 Jared Gilbert. All rights reserved.</Text>
+                        <Text style ={styles.copyrightText}>Unauthorized copying or distribution of this software, via any medium, is strictly prohibited.</Text>
+                    </View>
+                    
                 </View>
             </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
@@ -176,5 +177,6 @@ const styles = StyleSheet.create({
     error: { color: 'red', marginBottom: 8, textAlign: 'center' },
     link: { color: "blue", marginTop: 10, textAlign: "center" },
     icon: { width: 100, height: 100, alignSelf: 'center', marginBottom: 20 },
-    copyrightText: { fontSize: 12, color: '#888', textAlign: 'center', marginTop: 20 },
+    copyrightText: { fontSize: 12, color: '#888', textAlign: 'center' },
+    copyrightContainer: { position: 'absolute', bottom: 50, alignSelf: 'center', width: '90%'},
 })

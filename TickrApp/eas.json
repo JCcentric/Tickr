@@ -20,7 +20,7 @@
         "buildType": "apk"
       },
       "ios": {
-        "simulator": false,
+        "simulator": true,
         "autoIncrement": true,
         "credentialsSource": "remote"
       }

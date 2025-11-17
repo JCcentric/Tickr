@@ -23,10 +23,7 @@
       },
       "edgeToEdgeEnabled": true,
       "versionCode": 2,
-      "package": "com.jccentric.TickrApp",
-      "compileSdkVersion": 36,
-      "targetSdkVersion": 36,
-      "buildToolsVersion": "36.0.0"
+      "package": "com.jccentric.TickrApp"
     },
     "web": {
       "bundler": "metro",

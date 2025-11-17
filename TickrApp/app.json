@@ -8,9 +8,7 @@
     "scheme": "tickrapp",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
-    "developer": {
-      "host": "lan"
-    },
+    
     "ios": {
       "supportsTablet": true,
       "buildNumber": "1.1.1",

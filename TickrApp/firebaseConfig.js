@@ -5,14 +5,23 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import { getStorage } from "firebase/storage"; 
 
+
+// Load API keys and other config values from environment variables
+const apiKey = process.env.EXPO_PUBLIC_API_KEY;
+const authDomain = process.env.EXPO_PUBLIC_AUTH_DOMAIN;
+const projectId = process.env.EXPO_PUBLIC_PROJECT__ID;
+const storageBucket = process.env.EXPO_PUBLIC_STORAGE_BUCKET;
+const messagingSenderId = process.env.EXPO_PUBLIC_MESSAGE_SENDER_ID;
+const appId = process.env.EXPO_PUBLIC_APP_ID;
+
 // Web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: "AIzaSyDfMEbty2tprhTUMUjSPFI6AefkNQwJUGw",
-  authDomain: "tickrapp-001.firebaseapp.com",
-  projectId: "tickrapp-001",
-  storageBucket: "tickrapp-001.firebasestorage.app",
-  messagingSenderId: "618582402852",
-  appId: "1:618582402852:web:a05709692a7143873cb5b1"
+  apiKey: apiKey,
+  authDomain: authDomain,
+  projectId: projectId,
+  storageBucket: storageBucket,
+  messagingSenderId: messagingSenderId,
+  appId: appId
 };
 
 // Initialize Firebase app

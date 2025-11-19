@@ -12,6 +12,7 @@
       "supportsTablet": true,
       "buildNumber": "1",
       "bundleIdentifier": "com.jccentric.TickrApp",
+      "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
@@ -31,6 +32,18 @@
       "favicon": "./assets/images/favicon.png"
     },
     "plugins": [
+      [
+        "expo-build-properties",
+        {
+          "ios": {
+            "useFrameworks": "static",
+            "podfileProperties": {
+              "use_modular_headers": "true"
+            }
+          }
+        }
+      ],
+      
       "expo-router",
       [
         "expo-splash-screen",

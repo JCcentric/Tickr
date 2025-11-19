@@ -1,4 +1,4 @@
-import { ImageBackground, View, StyleSheet, Text, KeyboardAvoidingView, Platform, TextInput, ActivityIndicator, Button, TouchableOpacity, Keyboard, TouchableWithoutFeedback, Image } from 'react-native'
+import { View, StyleSheet, Text, KeyboardAvoidingView, Platform, TextInput, ActivityIndicator, Button, TouchableOpacity, Keyboard, TouchableWithoutFeedback, Image } from 'react-native'
 import React from 'react'
 import { useRouter } from 'expo-router';
 import { FirebaseError } from 'firebase/app';

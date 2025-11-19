@@ -60,5 +60,6 @@ target 'TICKR' do
    installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
       config.build_settings['CLANG_WARN_NON_MODULAR_INCLUDES_IN_FRAMEWORK_MODULES'] = 'NO'  
+    end
   end
 end

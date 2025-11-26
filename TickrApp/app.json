@@ -7,7 +7,7 @@
     "icon": "./assets/images/TICKR_Icon.png",
     "scheme": "tickrapp",
     "userInterfaceStyle": "light",
-    "newArchEnabled": true,
+    "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
       "buildNumber": "1",
@@ -37,6 +37,7 @@
         {
           "ios": {
             "useFrameworks": "static",
+            "newArchEnabled": false,
             "podfileProperties": {
               "use_modular_headers": "true"
             }

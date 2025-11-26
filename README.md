@@ -13,11 +13,9 @@ A React Native app built using Expo that allows users to create and manage Tickr
 3. [Installation](#installation)
 4. [Running the App](#running-the-app)
 5. [Testing on Devices](#testing-on-devices)
-6. [Screenshots](#screenshots)
-7. [Project Structure](#project-structure)
-8. [Maintenance Notes](#maintenance-notes)
-9. [Build & Deployment](#-build--deployment)
-10. [Useful Links](#-useful-links)
+6. [Maintenance Notes](#maintenance-notes)
+7. [Build & Deployment](#-build--deployment)
+8. [Useful Links](#-useful-links)
 
 ---
 
@@ -34,6 +32,19 @@ Before setting up the app, ensure you have the following installed:
 - [Git](https://git-scm.com/)
 - **Mac Users:** [Xcode](https://developer.apple.com/xcode/) for iOS testing
 - **Windows/Mac Users:** [Android Studio](https://developer.android.com/studio) for Android testing
+
+Additionally, you will need to set up .env in your root directory with your firebase API and variables:
+
+'''
+EXPO_PUBLIC_API_KEY="Your Firebase API key"
+EXPO_PUBLIC_AUTH_DOMAIN="Your Auth Domain"
+EXPO_PUBLIC_PROJECT__ID="Your Firebase Project ID"
+EXPO_PUBLIC_STORAGE_BUCKET="Your Firebase storage bucket"
+EXPO_PUBLIC_MESSAGE_SENDER_ID="Your Message Sender ID"
+EXPO_PUBLIC_APP_ID="Your App ID"
+'''
+
+All of this can be retried from your firebase console > Gear Icon > Project settings > General tab > Scroll down to Web apps. If not there, create app and go through the steps.
 
 ---
 
@@ -73,23 +84,6 @@ Or run in an emulator:
 - iOS: Requires Xcode installed and configured.
 - Android: Requires Android Studio and an emulator or a physical device with USB debugging enabled.
 
-## 📸 Screenshots
-(Add your screenshots here later)
-Home Screen	Create Tickr Screen
-
-## 📂 Project Structure
-```text
-tickr-app/
-│
-├── assets/          # Images and fonts
-├── components/      # Reusable UI components (e.g., TickrCard)
-├── screens/         # Screens like Home, CreateTickr, TickrDetails
-├── models/          # Class files for OOP design
-├── App.tsx          # Main entry point
-├── package.json     # Project dependencies
-└── README.md        # Project documentation
-```
-
 ## 🔧 Maintenance Notes
 Always pull the latest changes before making updates:
 ```
@@ -105,7 +99,7 @@ If you encounter issues with cached data, clear Expo cache:
 npx expo start -c
 ```
 ## ✅ Build & Deployment
-### Building for Production
+### Building for Development
 #### Android
 1. Make sure Android Studio and SDKs are installed.
 

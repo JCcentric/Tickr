@@ -10,9 +10,8 @@
     "newArchEnabled": false,
     "ios": {
       "supportsTablet": false,
-      "buildNumber": "1",
+      "buildNumber": "42",
       "bundleIdentifier": "com.jccentric.TickrApp",
-      "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false,
         "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to set profile pictures and event images.",

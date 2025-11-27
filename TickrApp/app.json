@@ -2,7 +2,7 @@
   "expo": {
     "name": "TICKR",
     "slug": "TickrApp",
-    "version": "1.1.38",
+    "version": "1.1.37",
     "orientation": "portrait",
     "icon": "./assets/images/TICKR_Icon.png",
     "scheme": "tickrapp",

@@ -4,6 +4,7 @@ import { getFirestore } from "firebase/firestore";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Platform } from 'react-native';
 import { getStorage } from "firebase/storage"; 
+import Constants from 'expo-constants';
 
 
 // Load API keys and other config values from environment variables

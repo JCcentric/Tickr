@@ -9,7 +9,7 @@
     "userInterfaceStyle": "light",
     "newArchEnabled": false,
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "buildNumber": "1",
       "bundleIdentifier": "com.jccentric.TickrApp",
       "googleServicesFile": "./GoogleService-Info.plist",

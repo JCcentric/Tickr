@@ -63,7 +63,8 @@
       "router": {},
       "eas": {
         "projectId": "eaaf8cc9-13a8-499b-afe8-e026a1cd62f0"
-      }
+      },
+      "googleServicesPlist": "@GOOGLE_SERVICES_PLIST"
     },
     "owner": "jccentric",
     "runtimeVersion": "1.0.0",

@@ -11,7 +11,8 @@
         "buildType": "apk"
       },
       "ios": {
-        "simulator": true
+        "simulator": true,
+        "googleServicesFile": "$GOOGLE_SERVICES_PLIST"
       }
     },
     "preview": {
@@ -22,7 +23,8 @@
       "ios": {
         "simulator": true,
         "autoIncrement": true,
-        "credentialsSource": "remote"
+        "credentialsSource": "remote",
+        "googleServicesFile": "$GOOGLE_SERVICES_PLIST"
       }
     },
     "production": {
@@ -33,7 +35,8 @@
       "ios": {
         "simulator": false,
         "autoIncrement": true,
-        "credentialsSource": "remote"
+        "credentialsSource": "remote",
+        "googleServicesFile": "$GOOGLE_SERVICES_PLIST"
       }
     }
   },

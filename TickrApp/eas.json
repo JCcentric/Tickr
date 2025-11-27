@@ -12,7 +12,9 @@
       },
       "ios": {
         "simulator": true,
-        "googleServicesFile": "$GOOGLE_SERVICES_PLIST"
+        "env": {
+        "GOOGLE_SERVICES_PLIST": "@GOOGLE_SERVICES_PLIST"
+        }
       }
     },
     "preview": {
@@ -24,7 +26,9 @@
         "simulator": true,
         "autoIncrement": true,
         "credentialsSource": "remote",
-        "googleServicesFile": "$GOOGLE_SERVICES_PLIST"
+        "env": {
+        "GOOGLE_SERVICES_PLIST": "@GOOGLE_SERVICES_PLIST"
+        }
       }
     },
     "production": {
@@ -36,7 +40,9 @@
         "simulator": false,
         "autoIncrement": true,
         "credentialsSource": "remote",
-        "googleServicesFile": "$GOOGLE_SERVICES_PLIST"
+        "env": {
+        "GOOGLE_SERVICES_PLIST": "@GOOGLE_SERVICES_PLIST"
+        }
       }
     }
   },

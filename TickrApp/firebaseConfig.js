@@ -7,21 +7,23 @@ import { getStorage } from "firebase/storage";
 
 
 // Load API keys and other config values from environment variables
-const apiKey = process.env.EXPO_PUBLIC_API_KEY;
-const authDomain = process.env.EXPO_PUBLIC_AUTH_DOMAIN;
-const projectId = process.env.EXPO_PUBLIC_PROJECT__ID;
-const storageBucket = process.env.EXPO_PUBLIC_STORAGE_BUCKET;
-const messagingSenderId = process.env.EXPO_PUBLIC_MESSAGE_SENDER_ID;
-const appId = process.env.EXPO_PUBLIC_APP_ID;
+const {
+  API_KEY,
+  AUTH_DOMAIN,
+  PROJECT_ID,
+  STORAGE_BUCKET,
+  MESSAGE_SENDER_ID,
+  APP_ID
+} = Constants.expoConfig.extra;
 
 // Web app's Firebase configuration
 const firebaseConfig = {
-  apiKey: apiKey,
-  authDomain: authDomain,
-  projectId: projectId,
-  storageBucket: storageBucket,
-  messagingSenderId: messagingSenderId,
-  appId: appId
+  apiKey: API_KEY,
+  authDomain: AUTH_DOMAIN,
+  projectId: PROJECT_ID,
+  storageBucket: STORAGE_BUCKET,
+  messagingSenderId: MESSAGE_SENDER_ID,
+  appId: APP_ID
 };
 
 // Initialize Firebase app

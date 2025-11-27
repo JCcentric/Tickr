@@ -14,12 +14,12 @@
         "simulator": true,
         "env": {
           "GOOGLE_SERVICES_PLIST": "@GOOGLE_SERVICES_PLIST",
-          "API_KEY": "@EXPO_PUBLIC_API_KEY",
-          "AUTH_DOMAIN": "@EXPO_PUBLIC_AUTH_DOMAIN",
-          "PROJECT_ID": "@EXPO_PUBLIC_PROJECT_ID",
-          "STORAGE_BUCKET": "@EXPO_PUBLIC_STORAGE_BUCKET",
-          "MESSAGE_SENDER_ID": "@EXPO_PUBLIC_MESSAGE_SENDER_ID",
-          "APP_ID": "@EXPO_PUBLIC_APP_ID"
+          "API_KEY": "@API_KEY",
+          "AUTH_DOMAIN": "@AUTH_DOMAIN",
+          "PROJECT_ID": "@PROJECT_ID",
+          "STORAGE_BUCKET": "@STORAGE_BUCKET",
+          "MESSAGE_SENDER_ID": "@MESSAGE_SENDER_ID",
+          "APP_ID": "@APP_ID"
         }
       }
     },
@@ -34,12 +34,12 @@
         "credentialsSource": "remote",
         "env": {
           "GOOGLE_SERVICES_PLIST": "@GOOGLE_SERVICES_PLIST",
-          "API_KEY": "@EXPO_PUBLIC_API_KEY",
-          "AUTH_DOMAIN": "@EXPO_PUBLIC_AUTH_DOMAIN",
-          "PROJECT_ID": "@EXPO_PUBLIC_PROJECT_ID",
-          "STORAGE_BUCKET": "@EXPO_PUBLIC_STORAGE_BUCKET",
-          "MESSAGE_SENDER_ID": "@EXPO_PUBLIC_MESSAGE_SENDER_ID",
-          "APP_ID": "@EXPO_PUBLIC_APP_ID"
+          "API_KEY": "@API_KEY",
+          "AUTH_DOMAIN": "@AUTH_DOMAIN",
+          "PROJECT_ID": "@PROJECT_ID",
+          "STORAGE_BUCKET": "@STORAGE_BUCKET",
+          "MESSAGE_SENDER_ID": "@MESSAGE_SENDER_ID",
+          "APP_ID": "@APP_ID"
         }
       }
     },
@@ -54,12 +54,12 @@
         "credentialsSource": "remote",
         "env": {
           "GOOGLE_SERVICES_PLIST": "@GOOGLE_SERVICES_PLIST",
-          "API_KEY": "@EXPO_PUBLIC_API_KEY",
-          "AUTH_DOMAIN": "@EXPO_PUBLIC_AUTH_DOMAIN",
-          "PROJECT_ID": "@EXPO_PUBLIC_PROJECT_ID",
-          "STORAGE_BUCKET": "@EXPO_PUBLIC_STORAGE_BUCKET",
-          "MESSAGE_SENDER_ID": "@EXPO_PUBLIC_MESSAGE_SENDER_ID",
-          "APP_ID": "@EXPO_PUBLIC_APP_ID"
+          "API_KEY": "@API_KEY",
+          "AUTH_DOMAIN": "@AUTH_DOMAIN",
+          "PROJECT_ID": "@PROJECT_ID",
+          "STORAGE_BUCKET": "@STORAGE_BUCKET",
+          "MESSAGE_SENDER_ID": "@MESSAGE_SENDER_ID",
+          "APP_ID": "@APP_ID"
         }
       }
     }

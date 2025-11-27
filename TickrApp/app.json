@@ -14,7 +14,9 @@
       "bundleIdentifier": "com.jccentric.TickrApp",
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSPhotoLibraryUsageDescription": "This app needs access to your photo library to set profile pictures and event images.",
+        "NSCameraUsageDescription": "This app needs camera access to take photos for events."
       }
     },
     "android": {

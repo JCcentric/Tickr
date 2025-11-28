@@ -7,25 +7,18 @@ import { getStorage } from "firebase/storage";
 import Constants from 'expo-constants';
 
 
-// Load API keys and other config values from environment variables
-const {
-  API_KEY,
-  AUTH_DOMAIN,
-  PROJECT_ID,
-  STORAGE_BUCKET,
-  MESSAGE_SENDER_ID,
-  APP_ID
-} = Constants.expoConfig.extra;
-
-// Web app's Firebase configuration
+// Attempt to read values from EAS secrets first, then fallback to local .env
 const firebaseConfig = {
-  apiKey: API_KEY,
-  authDomain: AUTH_DOMAIN,
-  projectId: PROJECT_ID,
-  storageBucket: STORAGE_BUCKET,
-  messagingSenderId: MESSAGE_SENDER_ID,
-  appId: APP_ID
+  apiKey: Constants.expoConfig.extra?.API_KEY || process.env.API_KEY,
+  authDomain: Constants.expoConfig.extra?.AUTH_DOMAIN || process.env.AUTH_DOMAIN,
+  projectId: Constants.expoConfig.extra?.PROJECT_ID || process.env.PROJECT_ID,
+  storageBucket: Constants.expoConfig.extra?.STORAGE_BUCKET || process.env.STORAGE_BUCKET,
+  messagingSenderId: Constants.expoConfig.extra?.MESSAGE_SENDER_ID || process.env.MESSAGE_SENDER_ID,
+  appId: Constants.expoConfig.extra?.APP_ID || process.env.APP_ID
 };
+
+// Log values (optional)
+console.log("Firebase config values:", firebaseConfig);
 
 // Initialize Firebase app
 const app = initializeApp(firebaseConfig);

@@ -8,7 +8,17 @@
       "developmentClient": true,
       "distribution": "internal",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "autoIncrement": true,
+        "env": {
+          "GOOGLE_SERVICES_PLIST": "@GOOGLE_SERVICE_PLIST",
+          "API_KEY": "@API_KEY",
+          "AUTH_DOMAIN": "@AUTH_DOMAIN",
+          "PROJECT_ID": "@PROJECT_ID",
+          "STORAGE_BUCKET": "@STORAGE_BUCKET",
+          "MESSAGE_SENDER_ID": "@MESSAGE_SENDER_ID",
+          "APP_ID": "@APP_ID"
+        }
       },
       "ios": {
         "simulator": true,
@@ -26,7 +36,17 @@
     "preview": {
       "distribution": "internal",
       "android": {
-        "buildType": "apk"
+        "buildType": "apk",
+        "autoIncrement": true,
+        "env": {
+          "GOOGLE_SERVICES_PLIST": "@GOOGLE_SERVICE_PLIST",
+          "API_KEY": "@API_KEY",
+          "AUTH_DOMAIN": "@AUTH_DOMAIN",
+          "PROJECT_ID": "@PROJECT_ID",
+          "STORAGE_BUCKET": "@STORAGE_BUCKET",
+          "MESSAGE_SENDER_ID": "@MESSAGE_SENDER_ID",
+          "APP_ID": "@APP_ID"
+        }
       },
       "ios": {
         "simulator": true,

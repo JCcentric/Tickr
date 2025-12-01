@@ -10,7 +10,7 @@
     "newArchEnabled": false,
     "ios": {
       "supportsTablet": true,
-      "buildNumber": "42",
+      "buildNumber": "1.2.0",
       "bundleIdentifier": "com.jccentric.TickrApp",
       "googleServicesFile": "./GoogleService-Info.plist",
       "infoPlist": {
@@ -27,7 +27,7 @@
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "versionCode": 2,
+      "versionCode": 3,
       "package": "com.jccentric.TickrApp"
     },
     "web": {
@@ -64,6 +64,12 @@
           "imageWidth": 200,
           "resizeMode": "contain",
           "backgroundColor": "#ffffff"
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "iosAppId": "ca-app-pub-5948289925255821~5581271378"
         }
       ]
     ],

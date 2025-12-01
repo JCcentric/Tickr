@@ -13,6 +13,9 @@ import { getStorage, ref, deleteObject } from "firebase/storage";
 import { LinearGradient } from 'expo-linear-gradient';
 import TickrCard from '@/components/TickrCard';
 
+//ads import
+import { BannerAd, BannerAdSize, TestIds } from 'react-native-google-mobile-ads';
+
 export default function HomeScreen() {
   const router = useRouter();
   const [loading, setLoading] = useState(true);
@@ -193,6 +196,15 @@ export default function HomeScreen() {
   } as const;
 
 
+  //AdMob banner
+  const adUnitId = __DEV__
+    ? TestIds.BANNER
+    : Platform.select({
+        ios: 'ca-app-pub-3940256099942544/2435281174'
+      }) || '';
+
+
+
 
   return (
 
@@ -351,6 +363,17 @@ export default function HomeScreen() {
             </TouchableOpacity>
           </Animated.View>
           
+          {/* AdMob Banner */}
+          <View style={{ alignItems: 'center', marginBottom: 0}}>
+            <BannerAd
+              unitId={adUnitId}
+              size={BannerAdSize.FULL_BANNER}
+              requestOptions={{
+                requestNonPersonalizedAdsOnly: true,
+              }}
+            />
+          </View>
+
         </SafeAreaView>
         </LinearGradient>
       </TouchableWithoutFeedback>

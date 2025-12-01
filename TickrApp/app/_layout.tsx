@@ -6,6 +6,7 @@ import { ActivityIndicator, View, StyleSheet } from "react-native";
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import "../global.css";
 import "react-datepicker/dist/react-datepicker.css";
+import mobileAds, { MaxAdContentRating } from 'react-native-google-mobile-ads';
 
 
 
@@ -13,6 +14,23 @@ import "react-datepicker/dist/react-datepicker.css";
 export default function RootLayout() {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+
+  //AdMob initialization
+  useEffect(() => {
+  // Configure SDK
+  mobileAds().setRequestConfiguration({
+    maxAdContentRating: MaxAdContentRating.PG,
+    tagForChildDirectedTreatment: true,
+    tagForUnderAgeOfConsent: true,
+  });
+
+  // Initialize SDK
+  mobileAds()
+    .initialize()
+    .then(adapterStatuses => {
+      console.log('AdMob initialized:', adapterStatuses);
+    });
+  }, []);
 
   //Run at app start
   useEffect(() => {

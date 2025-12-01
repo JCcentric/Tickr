@@ -8,14 +8,15 @@ import Constants from 'expo-constants';
 
 
 // Attempt to read values from EAS secrets first, then fallback to local .env
-const firebaseConfig = {
+  const firebaseConfig = {
   apiKey: Constants.expoConfig.extra?.API_KEY || process.env.API_KEY,
   authDomain: Constants.expoConfig.extra?.AUTH_DOMAIN || process.env.AUTH_DOMAIN,
   projectId: Constants.expoConfig.extra?.PROJECT_ID || process.env.PROJECT_ID,
   storageBucket: Constants.expoConfig.extra?.STORAGE_BUCKET || process.env.STORAGE_BUCKET,
   messagingSenderId: Constants.expoConfig.extra?.MESSAGE_SENDER_ID || process.env.MESSAGE_SENDER_ID,
   appId: Constants.expoConfig.extra?.APP_ID || process.env.APP_ID
-};
+}; 
+
 
 // Log values (optional)
 console.log("Firebase config values:", firebaseConfig);

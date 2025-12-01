@@ -1,6 +1,8 @@
 import { Text, Platform, useWindowDimensions, ActivityIndicator, StyleSheet, View, TouchableOpacity, FlatList, TextInput, Image, TouchableWithoutFeedback, Keyboard, Animated, SafeAreaView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Swipeable } from 'react-native-gesture-handler';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
 
 import { onAuthStateChanged } from 'firebase/auth';
 import { auth, db } from '@/firebaseConfig';
@@ -19,11 +21,13 @@ export default function HomeScreen() {
   const [searchQuery, setSearchQuery] = useState("");
   const [profilePic, setProfilePic] = useState<string | null>(null);
   const scaleValue = new Animated.Value(1);
+  const insets = useSafeAreaInsets();
 
-  // Determine screen size for responsive design for web
+  // Determine screen size for responsive design for web and mobile
   const { width } = useWindowDimensions();
   const isWeb = Platform.OS === 'web';
   const isLargeScreen = isWeb && width > 800;
+  const profileSize = width < 380 ? 40 : 50;
 
   useEffect(() => {
   const user = auth.currentUser;
@@ -179,6 +183,17 @@ export default function HomeScreen() {
   }
 
 
+  //profile picture size adjustment based on screen size
+  const dynamicProfileIconStyle = {
+    position: "absolute",
+    top: insets.top + 3,
+    right: 15,
+    zIndex: 10,
+    padding: 3,
+  } as const;
+
+
+
   return (
 
     //Web View
@@ -267,7 +282,7 @@ export default function HomeScreen() {
           <Text style={styles.title}>Your Tickrs</Text>
 
           {/*Profile Button*/} 
-          <TouchableOpacity style={styles.profileIcon} onPress={() => router.push("/profile")}>
+          <TouchableOpacity style={dynamicProfileIconStyle} onPress={() => router.push("/profile")}>
             {profilePic ? (
               <Image 
               source={{ uri: profilePic }} 
@@ -343,6 +358,7 @@ export default function HomeScreen() {
   );
 }
 
+
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 15, justifyContent: "flex-start" },
   loadingContainer: { flex: 1, justifyContent: "center", alignItems: "center" },
@@ -387,12 +403,6 @@ const styles = StyleSheet.create({
     flex: 1,
     fontSize: 16,
     color: "#000"
-  },
-  profileIcon: {
-    position: "absolute",
-    top: 55,
-    right: 20,
-    padding: 5,
   },
   profileImage: { 
     width: 45,

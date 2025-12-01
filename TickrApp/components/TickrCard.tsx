@@ -1,5 +1,7 @@
 import { StyleSheet, Text, View, ImageBackground, TouchableOpacity } from 'react-native'
 import React, { useEffect, useState } from 'react'
+import { useScheduleEventNotifications } from "../hooks/useScheduleEventNotifications";
+
 
 type TickrCardProps = {
   title: string;
@@ -12,11 +14,15 @@ type TickrCardProps = {
 const TickrCard: React.FC<TickrCardProps> = ({ title, description, date, image, onPress }) => {
   const [timeLeft, setTimeLeft] = useState(getTimeLeft());
 
+  //Calls schedule notification hook
+  useScheduleEventNotifications(title, date);
+  
   // Calculate time left until the event date
   function getTimeLeft() {
-    const eventDate = new Date(date).getTime();
-    const now = new Date().getTime();
-    const diff = eventDate - now;
+    const eventDate = new Date(date)
+    eventDate.setHours(0,0,0,0);
+    const now = new Date().getTime()
+    const diff = eventDate.getTime() - now;
 
     if (diff <= 0) return "Event passed";
 

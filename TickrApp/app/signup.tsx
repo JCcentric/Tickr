@@ -1,11 +1,13 @@
 import { View, StyleSheet, Text, TextInput, ActivityIndicator, Button, TouchableOpacity, Keyboard } from 'react-native'
 import React from 'react'
+import { useState } from 'react';
 import { useRouter } from 'expo-router';
 import { FirebaseError } from 'firebase/app';
 import { auth, db } from '@/firebaseConfig';
 import { TouchableWithoutFeedback } from 'react-native';
 import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
 import { doc, serverTimestamp, setDoc } from 'firebase/firestore';
+import { Eye, EyeOff } from 'lucide-react-native';
 
 export default function SignUpPage() {
 
@@ -15,6 +17,7 @@ export default function SignUpPage() {
         const [lastName, setLastName] = React.useState<string>('');
         const [email, setEmail] = React.useState<string>('');
         const [password, setPassword] = React.useState<string>('');
+        const [showPassword, setShowPassword] = useState(false);
         const [confirmPassword, setConfirmPassword] = React.useState<string>('');
         const [error, setError] = React.useState<string>('');
         const [submitting, setSubmitting ] = React.useState<boolean>(false);    
@@ -116,14 +119,23 @@ export default function SignUpPage() {
                 onChangeText={setEmail}
                 editable={!submitting}
                 />
-            <TextInput
-            style={styles.input}
-            placeholder="Password"
-            secureTextEntry
-            value={password}
-            onChangeText={setPassword}
-            editable={!submitting}
-            />
+            <View style={{ width: '100%', marginBottom: 12, position: 'relative' }}>
+                <TextInput
+                style={styles.input}
+                placeholder="Password"
+                secureTextEntry = {!showPassword}
+                value={password}
+                onChangeText={setPassword}
+                editable={!submitting}
+                />
+                <TouchableOpacity
+                    style={styles.icon}
+                    onPress={() => setShowPassword(prev => !prev)} // toggle show/hide
+                >
+                    {showPassword ? <EyeOff size={24} /> : <Eye size={24} />}
+                </TouchableOpacity>
+            </View>
+            
             <TextInput
             style={styles.input}
             placeholder="Confirm Password"
@@ -172,9 +184,10 @@ const styles = StyleSheet.create({
     container: {flex: 1, justifyContent: 'center', alignItems: 'center', padding: 20},
     nameInputContainer: {width: '80%', flexDirection: 'row', justifyContent: 'space-between', marginBottom: 20},
     nameInput: {marginHorizontal: 0, height: 40, width: 150, borderColor: 'gray', borderWidth: 1, paddingHorizontal: 10, borderRadius: 5},
-    input: {height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 12, paddingHorizontal: 10, width: '100%', borderRadius: 5},
+    input: {paddingRight: 40, height: 40, borderColor: 'gray', borderWidth: 1, marginBottom: 12, paddingHorizontal: 10, width: '100%', borderRadius: 5},
     title: {fontSize: 24, fontWeight: 'bold', marginBottom: 20},
     error: {color: 'red', marginBottom: 8, textAlign: 'center'},
     link: { color: "blue", marginTop: 10, textAlign: "center" },
-    link2: { color: "grey", marginTop: 10, textAlign: "center" }
+    link2: { color: "grey", marginTop: 10, textAlign: "center" },
+    icon: { position: 'absolute', right: 10, top: 10 }
 })
